@@ -1,0 +1,15 @@
+source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
+
+target 'HYCache_Example', :exclusive => true do
+  pod 'HYCache', :path => '../'
+end
+
+target 'HYCache_Tests', :exclusive => true do
+  pod 'HYCache', :path => '../'
+
+  pod 'Specta'
+  pod 'Expecta'
+  pod 'FBSnapshotTestCase'
+  pod 'Expecta+Snapshots'
+end
