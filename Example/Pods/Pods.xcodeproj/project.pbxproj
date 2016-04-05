@@ -24,6 +24,10 @@
 		1A1AB2EC52323C5EA28DAA99F1E1A90D /* EXPMatchers+endWith.h in Headers */ = {isa = PBXBuildFile; fileRef = 306E137B97A38C22CEC1E6B27B33B78A /* EXPMatchers+endWith.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1AB3304B6884F626BC54150AC7565E18 /* EXPMatchers+equal.m in Sources */ = {isa = PBXBuildFile; fileRef = 0782314CEFBB6F81294F8002EBFB578E /* EXPMatchers+equal.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		1B0389CD88AA949B34DC7269030FEC6F /* EXPMatchers+beGreaterThanOrEqualTo.m in Sources */ = {isa = PBXBuildFile; fileRef = 64E62B947C08376C71E07F669D636FF8 /* EXPMatchers+beGreaterThanOrEqualTo.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		1E4AADCC1CB3E2AE008AD529 /* HYDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E4AADCA1CB3E2AE008AD529 /* HYDiskCache.h */; };
+		1E4AADCD1CB3E2AE008AD529 /* HYDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E4AADCB1CB3E2AE008AD529 /* HYDiskCache.m */; };
+		1E4AADD01CB3E2BC008AD529 /* HYMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E4AADCE1CB3E2BC008AD529 /* HYMemoryCache.h */; };
+		1E4AADD11CB3E2BC008AD529 /* HYMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E4AADCF1CB3E2BC008AD529 /* HYMemoryCache.m */; };
 		1FB9DC48E86DD445104E5597F8254C56 /* Specta.h in Headers */ = {isa = PBXBuildFile; fileRef = FB362E8DBE566CD58ABD4124535F2081 /* Specta.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		201BF9C605852822CA5A65ADE282A310 /* EXPMatcherHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = C22221B3B6D1F46AB81218794BF7243C /* EXPMatcherHelpers.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		204D694B03BFF3B244A6AB73FACFFC43 /* Expecta-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A4579B877C302F516E9CEE77766372 /* Expecta-dummy.m */; };
@@ -100,7 +104,6 @@
 		90C764A48D37731A28FF1AE19604025B /* SPTCallSite.h in Headers */ = {isa = PBXBuildFile; fileRef = F0550288A3E4DA5B207A666BE8E62168 /* SPTCallSite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		918E06480F28F27361B19D19432F8538 /* EXPMatchers+endWith.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EF2072991CBA5987025178150BD49F6 /* EXPMatchers+endWith.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		931D410B9F8ACB935883DF8C59F9C93E /* EXPMatchers+postNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A7D54F2046B9323D0CB2748E382BAA3 /* EXPMatchers+postNotification.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		94B6526F062EE7BD6D15DDD103B041E4 /* ReplaceMe.m in Sources */ = {isa = PBXBuildFile; fileRef = 86A202AB456C15C70BE9182F810586BA /* ReplaceMe.m */; };
 		94C47C87E397972CE98F75929F3B706C /* ExpectaObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C4016D8E6902B23AF2CA1BB3EBE78467 /* ExpectaObject.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		999B272C649A4A6E968EC03B58FA24C7 /* Pods-HYCache_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = D2705B2AB3E73877A3E9468B071D3FAC /* Pods-HYCache_Tests-dummy.m */; };
 		9ACCEC34E508ED256FA50BABE77EC76C /* SPTExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C75DFE8C463E28459A9A9DD7E921822 /* SPTExample.m */; };
@@ -242,6 +245,10 @@
 		18A4C7651D93EA7961A58155BBDF43CF /* FBSnapshotTestCasePlatform.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FBSnapshotTestCasePlatform.m; path = FBSnapshotTestCase/FBSnapshotTestCasePlatform.m; sourceTree = "<group>"; };
 		19D7E0FEC362BEC211648D104511BD5C /* EXPMatchers+beTruthy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "EXPMatchers+beTruthy.m"; path = "Expecta/Matchers/EXPMatchers+beTruthy.m"; sourceTree = "<group>"; };
 		1ABB2201E2C23ED09ECB1930B874AA59 /* NSValue+Expecta.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSValue+Expecta.h"; path = "Expecta/NSValue+Expecta.h"; sourceTree = "<group>"; };
+		1E4AADCA1CB3E2AE008AD529 /* HYDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYDiskCache.h; sourceTree = "<group>"; };
+		1E4AADCB1CB3E2AE008AD529 /* HYDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYDiskCache.m; sourceTree = "<group>"; };
+		1E4AADCE1CB3E2BC008AD529 /* HYMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYMemoryCache.h; sourceTree = "<group>"; };
+		1E4AADCF1CB3E2BC008AD529 /* HYMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYMemoryCache.m; sourceTree = "<group>"; };
 		1E7BBDA96EB748B4566D121043C548C0 /* Specta-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Specta-prefix.pch"; sourceTree = "<group>"; };
 		217541153E2CFCFCDDF21E0A50E2155D /* Pods-HYCache_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-HYCache_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		222277628576E6CB279473688BA88F01 /* EXPMatchers+conformTo.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "EXPMatchers+conformTo.m"; path = "Expecta/Matchers/EXPMatchers+conformTo.m"; sourceTree = "<group>"; };
@@ -318,7 +325,6 @@
 		7EF2072991CBA5987025178150BD49F6 /* EXPMatchers+endWith.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "EXPMatchers+endWith.m"; path = "Expecta/Matchers/EXPMatchers+endWith.m"; sourceTree = "<group>"; };
 		827940DAD186863374E719CC8D5FCE23 /* SPTCallSite.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SPTCallSite.m; path = Specta/Specta/SPTCallSite.m; sourceTree = "<group>"; };
 		83D545281FC5701ED472981FFF1EBF4E /* Pods-HYCache_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-HYCache_Tests.modulemap"; sourceTree = "<group>"; };
-		86A202AB456C15C70BE9182F810586BA /* ReplaceMe.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = ReplaceMe.m; sourceTree = "<group>"; };
 		8B52C3887A118767CC0A773555B7C029 /* ExpectaSupport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ExpectaSupport.h; path = Expecta/ExpectaSupport.h; sourceTree = "<group>"; };
 		8CE42337022021AE45B4E067D494C32F /* EXPUnsupportedObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = EXPUnsupportedObject.h; path = Expecta/EXPUnsupportedObject.h; sourceTree = "<group>"; };
 		8F63B0FF272D1EB750D82F3EADA2D2CA /* EXPExpect.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = EXPExpect.h; path = Expecta/EXPExpect.h; sourceTree = "<group>"; };
@@ -489,6 +495,24 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		1E4AADC81CB3E29A008AD529 /* HYDiskCache */ = {
+			isa = PBXGroup;
+			children = (
+				1E4AADCA1CB3E2AE008AD529 /* HYDiskCache.h */,
+				1E4AADCB1CB3E2AE008AD529 /* HYDiskCache.m */,
+			);
+			path = HYDiskCache;
+			sourceTree = "<group>";
+		};
+		1E4AADC91CB3E29A008AD529 /* HYMemoryCache */ = {
+			isa = PBXGroup;
+			children = (
+				1E4AADCE1CB3E2BC008AD529 /* HYMemoryCache.h */,
+				1E4AADCF1CB3E2BC008AD529 /* HYMemoryCache.m */,
+			);
+			path = HYMemoryCache;
+			sourceTree = "<group>";
+		};
 		25823D98072A86925BD8984853B7788E /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -513,7 +537,8 @@
 		272247F46DBCCDA4B3A868AB082391CD /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				86A202AB456C15C70BE9182F810586BA /* ReplaceMe.m */,
+				1E4AADC81CB3E29A008AD529 /* HYDiskCache */,
+				1E4AADC91CB3E29A008AD529 /* HYMemoryCache */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -965,6 +990,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				45496B0B3B0D86FFFC959BEF6A55E5FA /* HYCache-umbrella.h in Headers */,
+				1E4AADCC1CB3E2AE008AD529 /* HYDiskCache.h in Headers */,
+				1E4AADD01CB3E2BC008AD529 /* HYMemoryCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1173,8 +1200,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E4AADCD1CB3E2AE008AD529 /* HYDiskCache.m in Sources */,
 				8B271219A3FC016249AD27262B5B4F1D /* HYCache-dummy.m in Sources */,
-				94B6526F062EE7BD6D15DDD103B041E4 /* ReplaceMe.m in Sources */,
+				1E4AADD11CB3E2BC008AD529 /* HYMemoryCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
