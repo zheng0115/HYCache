@@ -39,7 +39,8 @@
     }
     
     [self testSet];
-    [self testRemove];
+    //[self testRemove];
+    [self testTrimCost];
 }
 
 - (void)testSet
@@ -59,7 +60,7 @@
         //            }];
         //        });
         
-        [_cache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
+        [_cache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index] withCost:index];
     }
     CFTimeInterval finish = CACurrentMediaTime();
     
@@ -95,6 +96,14 @@
 //            printf("remove:   %8.2f\n", f * 1000);
 //        });
 //    }];
+}
+
+- (void)testTrimCost
+{
+    [_cache trimToCost:1000 block:^(HYMemoryCache * _Nonnull cache) {
+       
+        
+    }];
 }
 
 - (void)didReceiveMemoryWarning

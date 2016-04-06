@@ -73,6 +73,7 @@ typedef void (^HYMemoryCacheObjectBlock) (HYMemoryCache *cache, NSString *key, i
 
 - (BOOL)containsObjectForKey:(id)key;
 
+- (void)trimToCost:(NSUInteger)cost block:(nullable HYMemoryCacheBlock)block;
 
 @end
 

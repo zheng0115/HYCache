@@ -36,9 +36,27 @@ static inline void unLock()
     NSTimeInterval _age;
 }
 
+- (NSComparisonResult)compare:(_HYMemoryCacheItem *)cacheItem;
+
 @end
 
 @implementation _HYMemoryCacheItem
+
+- (NSComparisonResult)compare:(_HYMemoryCacheItem *)cacheItem
+{
+    if (!cacheItem) return NSOrderedSame;
+    
+    if (_age < cacheItem->_age)
+    {
+        return NSOrderedDescending;
+    }
+    else if (_age > cacheItem->_age)
+    {
+        return NSOrderedAscending;
+    }
+    return NSOrderedSame;
+}
+
 @end
 
 #pragma mark HYMemoryCache
@@ -296,6 +314,49 @@ static inline void unLock()
     unLock();
     
     return item != nil;
+}
+
+- (void)trimToCost:(NSUInteger)cost block:(nullable HYMemoryCacheBlock)block
+{
+    __weak HYMemoryCache *weakSelf = self;
+    dispatch_async(_concurrentQueue, ^{
+        
+        HYMemoryCache *stronglySelf = weakSelf;
+        
+        [self p_trimToCost:cost];
+        
+        if (block)
+        {
+            block(stronglySelf);
+        }
+    });
+}
+
+//not impliment LRU
+- (void)p_trimToCost:(NSUInteger)cost
+{
+    NSUInteger totalCost = 0;
+    lock();
+    totalCost = _totalCostNow;
+    unLock();
+    if (totalCost <= cost) return;
+    
+    lock();
+    NSMutableDictionary *dic = (__bridge NSMutableDictionary *)_objectDic;
+    NSArray *keys = [dic keysSortedByValueUsingSelector:@selector(compare:)];
+    unLock();
+    
+    for (NSString *key in keys)
+    {
+        [self removeObjectForKey:key];// lastest objects first
+        
+        lock();
+        totalCost = _totalCostNow;
+        unLock();
+        
+        if (totalCost <= cost)
+            break;
+    }
 }
 
 #pragma mark getter setter
