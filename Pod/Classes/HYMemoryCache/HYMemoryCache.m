@@ -42,17 +42,18 @@ static inline void unLock()
 
 @implementation _HYMemoryCacheItem
 
+//not implement LRU,just old objects first
 - (NSComparisonResult)compare:(_HYMemoryCacheItem *)cacheItem
 {
     if (!cacheItem) return NSOrderedSame;
     
     if (_age < cacheItem->_age)
     {
-        return NSOrderedDescending;
+        return NSOrderedAscending;
     }
     else if (_age > cacheItem->_age)
     {
-        return NSOrderedAscending;
+        return NSOrderedDescending;
     }
     return NSOrderedSame;
 }
@@ -68,6 +69,10 @@ static inline void unLock()
 
 @property (nonatomic, strong) dispatch_queue_t concurrentQueue;
 @property (nonatomic, copy, readwrite) NSString *name;
+
+inline _HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key);
+inline NSArray * p_keySortedByInCacheDate(CFMutableDictionaryRef _objectDic);
+
 @end
 
 @implementation HYMemoryCache
@@ -75,6 +80,7 @@ static inline void unLock()
 @synthesize totalCostNow = _totalCostNow;
 @synthesize costLimit = _costLimit;
 @synthesize maxAge = _maxAge;
+@synthesize trimToMaxAgeInterval = _trimToMaxAgeInterval;
 
 - (void)dealloc
 {
@@ -102,7 +108,9 @@ static inline void unLock()
         _removeObjectWhenAppReceiveMemoryWarning = YES;
         _totalCostNow = 0;
         _costLimit = 0;
-        _maxAge = 0.0;
+        _maxAge = 0.0f;
+        _trimToMaxAgeInterval = 30.0f;
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(didReceiveEnterBackgroundNotification:)
                                                      name:UIApplicationDidEnterBackgroundNotification
@@ -141,7 +149,7 @@ static inline void unLock()
     }
 }
 
-#pragma mark store
+#pragma mark set value
 
 - (void)setObject:(id)object
            forKey:(id)key
@@ -192,7 +200,7 @@ static inline void unLock()
 {
     if (!object || !key) return;
     
-    _HYMemoryCacheItem *item = [self objectForKey:key];
+    _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
     lock();
     if (item)
     {
@@ -221,9 +229,7 @@ static inline void unLock()
 {
     if (!key) return nil;
     
-    lock();
-    _HYMemoryCacheItem *item = CFDictionaryGetValue(_objectDic, (__bridge const void *)key);
-    unLock();
+    _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
     
     if (item) return item->_object;
     return nil;
@@ -246,6 +252,14 @@ static inline void unLock()
     });
 }
 
+_HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key)
+{
+    lock();
+    _HYMemoryCacheItem *item = CFDictionaryGetValue(objectDic, (__bridge const void *)key);
+    unLock();
+    return item;
+}
+
 #pragma mark remove value
 
 - (void)removeObjectForKey:(NSString *)key
@@ -256,7 +270,7 @@ static inline void unLock()
         
         HYMemoryCache *stronglySelf = weakSelf;
         
-        _HYMemoryCacheItem *item = [self objectForKey:key];
+        _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
         [self removeObjectForKey:key];
         
         if (block)
@@ -305,6 +319,8 @@ static inline void unLock()
     unLock();
 }
 
+#pragma mark contained value
+
 - (BOOL)containsObjectForKey:(id)key
 {
     if (!key) return NO;
@@ -315,6 +331,8 @@ static inline void unLock()
     
     return item != nil;
 }
+
+#pragma mark trim value
 
 - (void)trimToCost:(NSUInteger)cost block:(nullable HYMemoryCacheBlock)block
 {
@@ -332,7 +350,7 @@ static inline void unLock()
     });
 }
 
-//not impliment LRU
+//not implement LRU,just old objects first
 - (void)p_trimToCost:(NSUInteger)cost
 {
     NSUInteger totalCost = 0;
@@ -341,14 +359,11 @@ static inline void unLock()
     unLock();
     if (totalCost <= cost) return;
     
-    lock();
-    NSMutableDictionary *dic = (__bridge NSMutableDictionary *)_objectDic;
-    NSArray *keys = [dic keysSortedByValueUsingSelector:@selector(compare:)];
-    unLock();
+    NSArray *keys = p_keySortedByInCacheDate(_objectDic);
     
-    for (NSString *key in keys)
+    for (NSString *key in [keys reverseObjectEnumerator])
     {
-        [self removeObjectForKey:key];// lastest objects first
+        [self removeObjectForKey:key];// old objects first
         
         lock();
         totalCost = _totalCostNow;
@@ -357,6 +372,84 @@ static inline void unLock()
         if (totalCost <= cost)
             break;
     }
+}
+
+- (void)trimToCostLimitWithBlock:(nullable HYMemoryCacheBlock)block
+{
+    __weak HYMemoryCache *weakSelf = self;
+    dispatch_async(_concurrentQueue, ^{
+        
+        HYMemoryCache *stronglySelf = weakSelf;
+        
+        [self p_trimToCostLimit];
+        
+        if (block)
+        {
+            block(stronglySelf);
+        }
+    });
+}
+
+- (void)p_trimToCostLimit
+{
+    lock();
+    NSUInteger costLimit = _costLimit;
+    NSUInteger nowCost = _totalCostNow;
+    unLock();
+    
+    if (nowCost < costLimit) return;
+    if (costLimit == 0) return;
+    
+    [self p_trimToCost:costLimit];
+}
+
+- (void)p_trimToAgeLimitRecursively
+{
+    lock();
+    NSTimeInterval maxAge = _maxAge;
+    NSTimeInterval trimInterval = _trimToMaxAgeInterval;
+    unLock();
+    
+    if (maxAge == 0) return;
+    
+    NSArray *keys = p_keySortedByInCacheDate(_objectDic);
+    
+    for (NSString *key in [keys reverseObjectEnumerator])// old objects first
+    {
+        _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
+        if (item)
+        {
+            NSTimeInterval now = CACurrentMediaTime();
+            NSTimeInterval inTime = item->_age;
+            
+            if (now - inTime >= maxAge)
+            {
+                [self removeObjectForKey:key];
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    
+    dispatch_time_t interval = dispatch_time(DISPATCH_TIME_NOW, (int64_t)((trimInterval == 0 ? maxAge:trimInterval) * NSEC_PER_SEC));
+    
+    __weak HYMemoryCache *weakSelf = self;
+    dispatch_after(interval, _concurrentQueue, ^{
+       
+        HYMemoryCache *stronglySelf = weakSelf;
+        [stronglySelf p_trimToAgeLimitRecursively];
+    });
+}
+
+NSArray * p_keySortedByInCacheDate(CFMutableDictionaryRef _objectDic)
+{
+    lock();
+    NSMutableDictionary *dic = (__bridge NSMutableDictionary *)_objectDic;
+    NSArray *keys = [dic keysSortedByValueUsingSelector:@selector(compare:)];
+    unLock();
+    return keys;
 }
 
 #pragma mark getter setter
@@ -389,6 +482,8 @@ static inline void unLock()
     lock();
     _maxAge = maxAge;
     unLock();
+    
+    [self p_trimToAgeLimitRecursively];
 }
 
 - (NSTimeInterval)maxAge
@@ -397,6 +492,21 @@ static inline void unLock()
     NSTimeInterval age = _maxAge;
     unLock();
     return age;
+}
+
+- (void)setTrimToMaxAgeInterval:(NSTimeInterval)trimToMaxAgeInterval
+{
+    lock();
+    _trimToMaxAgeInterval = trimToMaxAgeInterval;
+    unLock();
+}
+
+- (NSTimeInterval)trimToMaxAgeInterval
+{
+    lock();
+    NSTimeInterval trimTime = _trimToMaxAgeInterval;
+    unLock();
+    return trimTime;
 }
 
 @end

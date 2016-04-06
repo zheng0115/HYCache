@@ -37,6 +37,7 @@ typedef void (^HYMemoryCacheObjectBlock) (HYMemoryCache *cache, NSString *key, i
 @property (nonatomic, assign) NSUInteger costLimit;
 
 @property (nonatomic, assign) NSTimeInterval maxAge;
+@property (nonatomic, assign) NSTimeInterval trimToMaxAgeInterval;
 
 @property(nonatomic, assign) BOOL removeObjectWhenAppReceiveMemoryWarning;
 @property(nonatomic, assign) BOOL removeObjectWhenAppEnterBackground;
@@ -74,6 +75,7 @@ typedef void (^HYMemoryCacheObjectBlock) (HYMemoryCache *cache, NSString *key, i
 - (BOOL)containsObjectForKey:(id)key;
 
 - (void)trimToCost:(NSUInteger)cost block:(nullable HYMemoryCacheBlock)block;
+- (void)trimToCostLimitWithBlock:(nullable HYMemoryCacheBlock)block;
 
 @end
 

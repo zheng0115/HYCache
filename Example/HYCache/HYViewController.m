@@ -28,6 +28,8 @@
     queue = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
     
     _cache = [[HYMemoryCache alloc] initWithName:@"fangyuxi"];
+    _cache.maxAge = 5.0f;
+    _cache.trimToMaxAgeInterval = 10.0f;
     
     _keys = [NSMutableArray array];
     _values = [NSMutableArray array];
@@ -40,7 +42,7 @@
     
     [self testSet];
     //[self testRemove];
-    [self testTrimCost];
+    //[self testTrimCost];
 }
 
 - (void)testSet
@@ -102,6 +104,11 @@
 {
     [_cache trimToCost:1000 block:^(HYMemoryCache * _Nonnull cache) {
        
+        
+    }];
+    
+    [_cache trimToCost:500 block:^(HYMemoryCache * _Nonnull cache) {
+        
         
     }];
 }
