@@ -7,12 +7,58 @@
 //
 
 #import "HYAppDelegate.h"
+#import "HYMemoryCache.h"
 
 @implementation HYAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    
+    dispatch_queue_t queue = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
+    
+    HYMemoryCache *cache = [HYMemoryCache sharedCache];
+    
+    NSMutableArray *keys = [NSMutableArray array];
+    NSMutableArray *values = [NSMutableArray array];
+    
+    for (NSInteger index = 0; index < 10000; ++index)
+    {
+        [keys addObject:@(index)];
+        [values addObject:@(index)];
+    }
+    
+    for (NSInteger index = 0; index < 10000; ++index)
+    {
+        dispatch_async(queue, ^{
+        
+            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    NSLog(@"Finish %@", object);
+                });
+
+            }];
+        });
+        
+    }
+    
+    dispatch_queue_t queue1 = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
+    
+    for (NSInteger index = 0; index < 10000; ++index)
+    {
+        dispatch_async(queue1, ^{
+            
+            [cache objectForKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    NSLog(@"%@", object);
+                });
+            }];
+        });
+    }
+    
     return YES;
 }
 
