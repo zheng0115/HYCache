@@ -156,8 +156,8 @@ static inline void unLock()
     lock();
     _totalCostNow += cost;
     CFDictionarySetValue(_objectDic, (__bridge const void *)key, (__bridge const void *)object);
-    CFDictionarySetValue(_datesDic, (__bridge const void *)key, (__bridge const void *)[NSDate new]);
-    CFDictionarySetValue(_costsDic, (__bridge const void *)key, (__bridge const void *)@(cost));
+    //CFDictionarySetValue(_datesDic, (__bridge const void *)key, (__bridge const void *)[NSDate new]);
+    //CFDictionarySetValue(_costsDic, (__bridge const void *)key, (__bridge const void *)@(cost));
     unLock();
 }
 

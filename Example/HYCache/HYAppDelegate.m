@@ -8,6 +8,7 @@
 
 #import "HYAppDelegate.h"
 #import "HYMemoryCache.h"
+#import "YYMemoryCache.h"
 
 @implementation HYAppDelegate
 
@@ -17,47 +18,72 @@
     dispatch_queue_t queue = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
     
     HYMemoryCache *cache = [HYMemoryCache sharedCache];
+    YYMemoryCache *yyCache = [YYMemoryCache new];
     
     NSMutableArray *keys = [NSMutableArray array];
     NSMutableArray *values = [NSMutableArray array];
     
-    for (NSInteger index = 0; index < 10000; ++index)
+    for (NSInteger index = 0; index < 200000; ++index)
     {
         [keys addObject:@(index)];
         [values addObject:@(index)];
     }
     
-    for (NSInteger index = 0; index < 10000; ++index)
+    CFTimeInterval start = CACurrentMediaTime();
+    for (NSInteger index = 0; index < 200000; ++index)
     {
-        dispatch_async(queue, ^{
-        
-            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    
-                    NSLog(@"Finish %@", object);
-                });
-
-            }];
-        });
-        
+//        dispatch_async(queue, ^{
+//        
+//            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+//                
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    
+//                    NSLog(@"Finish %@", object);
+//                });
+//
+//            }];
+//        });
+        [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index]];
     }
+    CFTimeInterval finish = CACurrentMediaTime();
     
-    dispatch_queue_t queue1 = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
+    CFTimeInterval f = finish - start;
+    printf("NSDictionary:   %8.2f\n", f * 1000);
     
-    for (NSInteger index = 0; index < 10000; ++index)
+    start = CACurrentMediaTime();
+    for (NSInteger index = 0; index < 200000; ++index)
     {
-        dispatch_async(queue1, ^{
-            
-            [cache objectForKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    
-                    NSLog(@"%@", object);
-                });
-            }];
-        });
+        //        dispatch_async(queue, ^{
+        //
+        //            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+        //
+        //                dispatch_async(dispatch_get_main_queue(), ^{
+        //
+        //                    NSLog(@"Finish %@", object);
+        //                });
+        //
+        //            }];
+        //        });
+        [yyCache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index]];
     }
+    finish = CACurrentMediaTime();
+    f = finish - start;
+    printf("NSDictionary:   %8.2f\n", f * 1000);
+//    dispatch_queue_t queue1 = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
+//    
+//    for (NSInteger index = 0; index < 10000; ++index)
+//    {
+//        dispatch_async(queue1, ^{
+//            
+//            [cache objectForKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+//                
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    
+//                    NSLog(@"%@", object);
+//                });
+//            }];
+//        });
+//    }
     
     return YES;
 }
