@@ -7,83 +7,21 @@
 //
 
 #import "HYAppDelegate.h"
-#import "HYMemoryCache.h"
-#import "YYMemoryCache.h"
+#import "HYViewController.h"
 
 @implementation HYAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.window = window;
     
-    dispatch_queue_t queue = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
+    HYViewController *controller = [[HYViewController alloc] init];
+    controller.title = @"HYCache Demo & BenckMark";
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:controller];
+    window.rootViewController = nav;
     
-    HYMemoryCache *cache = [HYMemoryCache sharedCache];
-    YYMemoryCache *yyCache = [YYMemoryCache new];
-    
-    NSMutableArray *keys = [NSMutableArray array];
-    NSMutableArray *values = [NSMutableArray array];
-    
-    for (NSInteger index = 0; index < 200000; ++index)
-    {
-        [keys addObject:@(index)];
-        [values addObject:@(index)];
-    }
-    
-    CFTimeInterval start = CACurrentMediaTime();
-    for (NSInteger index = 0; index < 200000; ++index)
-    {
-//        dispatch_async(queue, ^{
-//        
-//            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-//                
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    
-//                    NSLog(@"Finish %@", object);
-//                });
-//
-//            }];
-//        });
-        [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index]];
-    }
-    CFTimeInterval finish = CACurrentMediaTime();
-    
-    CFTimeInterval f = finish - start;
-    printf("NSDictionary:   %8.2f\n", f * 1000);
-    
-    start = CACurrentMediaTime();
-    for (NSInteger index = 0; index < 200000; ++index)
-    {
-        //        dispatch_async(queue, ^{
-        //
-        //            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-        //
-        //                dispatch_async(dispatch_get_main_queue(), ^{
-        //
-        //                    NSLog(@"Finish %@", object);
-        //                });
-        //
-        //            }];
-        //        });
-        [yyCache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index]];
-    }
-    finish = CACurrentMediaTime();
-    f = finish - start;
-    printf("NSDictionary:   %8.2f\n", f * 1000);
-//    dispatch_queue_t queue1 = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
-//    
-//    for (NSInteger index = 0; index < 10000; ++index)
-//    {
-//        dispatch_async(queue1, ^{
-//            
-//            [cache objectForKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-//                
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    
-//                    NSLog(@"%@", object);
-//                });
-//            }];
-//        });
-//    }
+    [window makeKeyAndVisible];
     
     return YES;
 }

@@ -10,8 +10,10 @@
 #import <pthread.h>
 #import <libkern/OSAtomic.h>
 
-static NSString *const queueName = @"com.hy.memcache.queueName";
+static NSString *const queueNamePrefix = @"com.HYCache.";
 static OSSpinLock mutexLock;
+
+#pragma mark lock
 
 static inline void lock()
 {
@@ -23,17 +25,31 @@ static inline void unLock()
     OSSpinLockUnlock(&mutexLock);
 }
 
+#pragma mark _HYMemoryCacheItem
+
+@interface _HYMemoryCacheItem : NSObject
+{
+    @package //need access in this framework
+    id _key;
+    id _object;
+    NSUInteger _cost;
+    NSTimeInterval _age;
+}
+
+@end
+
+@implementation _HYMemoryCacheItem
+@end
+
+#pragma mark HYMemoryCache
 
 @interface HYMemoryCache ()
 {
     CFMutableDictionaryRef _objectDic;
-    CFMutableDictionaryRef _datesDic;
-    CFMutableDictionaryRef _costsDic;
 }
 
 @property (nonatomic, strong) dispatch_queue_t concurrentQueue;
-//@property(nonatomic, unsafe_unretained) __attribute__((NSObject)) CFMutableDictionaryRef costsDic;
-
+@property (nonatomic, copy, readwrite) NSString *name;
 @end
 
 @implementation HYMemoryCache
@@ -45,31 +61,24 @@ static inline void unLock()
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-+ (instancetype)sharedCache
-{
-    static id cache;
-    static dispatch_once_t predicate;
-    
-    dispatch_once(&predicate, ^{
-        cache = [[self alloc] init];
-    });
-    
-    return cache;
+    CFRelease(_objectDic);
 }
 
 - (instancetype)init
+{
+    return [self initWithName:@"HYMemoryCache"];
+}
+
+- (instancetype)initWithName:(NSString *)name
 {
     self = [super init];
     if (self)
     {
         mutexLock = OS_SPINLOCK_INIT;
-        _concurrentQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
+        self.name = name;
+        _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@%@", queueNamePrefix, name] UTF8String], DISPATCH_QUEUE_CONCURRENT);
         
         _objectDic = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,&kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        _datesDic = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,&kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        _costsDic = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,&kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
         
         _removeObjectWhenAppEnterBackground = YES;
         _removeObjectWhenAppReceiveMemoryWarning = YES;
@@ -90,16 +99,28 @@ static inline void unLock()
     return nil;
 }
 
-#pragma mark notification
 
-- (void)didReceiveEnterBackgroundNotification:(NSNotification *)notification
-{
-    
-}
+
+#pragma mark notification
 
 - (void)didReceiveMemoryWarningNotification:(NSNotification *)notification
 {
-    
+    if (self.removeObjectWhenAppReceiveMemoryWarning)
+    {
+        [self removeAllObjectWithBlock:^(HYMemoryCache * _Nonnull cache) {
+            
+        }];
+    }
+}
+
+- (void)didReceiveEnterBackgroundNotification:(NSNotification *)notification
+{
+    if (self.removeObjectWhenAppEnterBackground)
+    {
+        [self removeAllObjectWithBlock:^(HYMemoryCache * _Nonnull cache) {
+            
+        }];
+    }
 }
 
 #pragma mark store
@@ -153,11 +174,26 @@ static inline void unLock()
 {
     if (!object || !key) return;
     
+    _HYMemoryCacheItem *item = [self objectForKey:key];
     lock();
-    _totalCostNow += cost;
-    CFDictionarySetValue(_objectDic, (__bridge const void *)key, (__bridge const void *)object);
-    //CFDictionarySetValue(_datesDic, (__bridge const void *)key, (__bridge const void *)[NSDate new]);
-    //CFDictionarySetValue(_costsDic, (__bridge const void *)key, (__bridge const void *)@(cost));
+    if (item)
+    {
+        item->_object = object;
+        item->_key = key;
+        item->_cost = cost;
+        item->_age = CACurrentMediaTime();
+        _totalCostNow = cost > item->_cost ? cost - item->_cost : item->_cost - cost;
+    }
+    else
+    {
+        _HYMemoryCacheItem *item = [_HYMemoryCacheItem new];
+        item->_object = object;
+        item->_key = key;
+        item->_cost = cost;
+        item->_age = CACurrentMediaTime();
+        _totalCostNow += cost;
+        CFDictionarySetValue(_objectDic, (__bridge const void *)key, (__bridge const void *)item);
+    }
     unLock();
 }
 
@@ -168,10 +204,11 @@ static inline void unLock()
     if (!key) return nil;
     
     lock();
-    id object = CFDictionaryGetValue(_objectDic, (__bridge const void *)key);
+    _HYMemoryCacheItem *item = CFDictionaryGetValue(_objectDic, (__bridge const void *)key);
     unLock();
     
-    return object;
+    if (item) return item->_object;
+    return nil;
 }
 
 - (void)objectForKey:(NSString *)key
@@ -196,28 +233,69 @@ static inline void unLock()
 - (void)removeObjectForKey:(NSString *)key
                  withBlock:(__nullable HYMemoryCacheObjectBlock)block
 {
-
+    __weak HYMemoryCache *weakSelf = self;
+    dispatch_async(_concurrentQueue, ^{
+        
+        HYMemoryCache *stronglySelf = weakSelf;
+        
+        _HYMemoryCacheItem *item = [self objectForKey:key];
+        [self removeObjectForKey:key];
+        
+        if (block)
+        {
+            block(stronglySelf, key, item);
+        }
+    });
 }
 
 - (void)removeObjectForKey:(id)key
 {
+    if(!key) return;
     
+    lock();
+    _HYMemoryCacheItem *item = CFDictionaryGetValue(_objectDic, (__bridge const void *)key);
+    if (item)
+    {
+        _totalCostNow -= item->_cost;
+        CFDictionaryRemoveValue(_objectDic, (__bridge const void *)key);
+    }
+    unLock();
 }
 
 
 - (void)removeAllObjectWithBlock:(__nullable HYMemoryCacheBlock)block
 {
-    
+    __weak HYMemoryCache *weakSelf = self;
+    dispatch_async(_concurrentQueue, ^{
+        
+        HYMemoryCache *stronglySelf = weakSelf;
+        
+        [self removeAllObject];
+        
+        if (block)
+        {
+            block(stronglySelf);
+        }
+    });
 }
 
 - (void)removeAllObject
 {
-    
+    lock();
+    _totalCostNow = 0;
+    CFDictionaryRemoveAllValues(_objectDic);
+    unLock();
 }
 
 - (BOOL)containsObjectForKey:(id)key
 {
-    return YES;
+    if (!key) return NO;
+    
+    lock();
+    _HYMemoryCacheItem *item = CFDictionaryGetValue(_objectDic, (__bridge const void *)key);
+    unLock();
+    
+    return item != nil;
 }
 
 #pragma mark getter setter

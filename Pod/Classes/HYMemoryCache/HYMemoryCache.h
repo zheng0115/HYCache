@@ -18,7 +18,20 @@ typedef void (^HYMemoryCacheObjectBlock) (HYMemoryCache *cache, NSString *key, i
 
 @interface HYMemoryCache : NSObject
 
-+ (instancetype)sharedCache;
+- (instancetype)init UNAVAILABLE_ATTRIBUTE;
++ (instancetype)new UNAVAILABLE_ATTRIBUTE;
+
+/**
+ *  指定初始化函数
+ *
+ *  @param name 缓存的名字，会用于queue的名字，便于调试，
+    如果有多个缓存对象，名字请唯一
+ *
+ *  @return cache object
+ */
+- (instancetype)initWithName:(NSString *)name NS_DESIGNATED_INITIALIZER;
+
+@property (nonatomic, copy, readonly) NSString *name;
 
 @property (nonatomic, assign, readonly) NSUInteger totalCostNow;
 @property (nonatomic, assign) NSUInteger costLimit;
