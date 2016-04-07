@@ -9,11 +9,13 @@
 #import "HYViewController.h"
 #import "HYMemoryCache.h"
 #import "HYDiskCache.h"
+#import "PINDiskCache.h"
 
 @interface HYViewController ()
 {
     HYMemoryCache *_memcache;
     HYDiskCache *_diskCache;
+    PINDiskCache *_pinCache;
     
     NSMutableArray *_keys;
     NSMutableArray *_values;
@@ -36,6 +38,7 @@
     _memcache.trimToMaxAgeInterval = 10.0f;
     
     _diskCache = [[HYDiskCache alloc] initWithName:@"fangyuxi"];
+    _pinCache = [[PINDiskCache alloc] initWithName:@"yangqian"];
     
     _keys = [NSMutableArray array];
     _values = [NSMutableArray array];
@@ -56,14 +59,7 @@
     CFTimeInterval start = CACurrentMediaTime();
     for (NSInteger index = 0; index < 50; ++index)
     {
-        [_diskCache setObject:[_values objectAtIndex:index] forKey:[[_keys objectAtIndex:index] stringValue] withBlock:^(HYDiskCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                        NSLog(@"Finish %@", key);
-                    });
-            
-        }];
+        [_diskCache setObject:[_values objectAtIndex:index] forKey:[[_keys objectAtIndex:index] stringValue]];
     }
     CFTimeInterval finish = CACurrentMediaTime();
     

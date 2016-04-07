@@ -110,9 +110,9 @@ static inline void unLock()
     item->lastAccessDate = [NSDate distantFuture];//暂无访问
     
     CFDictionarySetValue(_itemsDic, (__bridge const void*)item->key, (__bridge const void*)item);
-    BOOL result = [self _p_fileWriteWithName:item->fileName data:item->object];
-    [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
-    return result;
+    BOOL writeResult = [self _p_fileWriteWithName:item->fileName data:item->object];
+    BOOL setTimeResult = [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
+    return writeResult && setTimeResult;
 }
 - (BOOL)_saveObject:(NSData *)object key:(NSString *)key
 {
@@ -135,11 +135,16 @@ static inline void unLock()
     item->lastAccessDate = [NSDate distantFuture];//暂无访问
     item->fileName = [self _p_fileNameForKey:item->key];
     
+    //CFTimeInterval start = CACurrentMediaTime();
     if (!alreadyHas)
         CFDictionarySetValue(_itemsDic, (__bridge const void*)item->key, (__bridge const void*)item);
-    BOOL result = [self _p_fileWriteWithName:item->fileName data:object];
-    [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
-    return result;
+    BOOL writeResult = [self _p_fileWriteWithName:item->fileName data:object];
+    BOOL setTimeResult = [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
+    //CFTimeInterval finish = CACurrentMediaTime();
+    
+    //CFTimeInterval f = finish - start;
+    //printf("time:   %8.2f\n", f * 1000);
+    return writeResult && setTimeResult;
 }
 - (BOOL)_removeItemForKey:(NSString *)key
 {
@@ -398,11 +403,16 @@ static inline void unLock()
 {
     if (!object || key.length == 0) return;
     
+    //CFTimeInterval start = CACurrentMediaTime();
     NSData *data;
     if (self.customArchiveBlock)
         data = self.customArchiveBlock(object);
     else
         data = [NSKeyedArchiver archivedDataWithRootObject:object];
+    //CFTimeInterval finish = CACurrentMediaTime();
+    
+    //CFTimeInterval f = finish - start;
+    //printf("archive:   %8.2f\n", f * 1000);
     
     lock();
     [_storage _saveObject:data key:key];

@@ -43,6 +43,9 @@
 		34B6E9A30603BEBBD87BA535B7D384CA /* EXPMatchers+beInstanceOf.h in Headers */ = {isa = PBXBuildFile; fileRef = F6636C0229E54793FBCF41941077A50A /* EXPMatchers+beInstanceOf.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		353CF52675246CA1FDF7852C461E1DA9 /* SPTCompiledExample.m in Sources */ = {isa = PBXBuildFile; fileRef = C468A58BBD0142C1B15D5D1E99CD14D2 /* SPTCompiledExample.m */; };
 		372F7A9CCE59CE86316CF436F832A3FC /* EXPMatchers+beGreaterThanOrEqualTo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4DC57B05E96C2EB152A59EFCDB6F12 /* EXPMatchers+beGreaterThanOrEqualTo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		377C90351CB6B42C00146985 /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 377C90321CB6B42C00146985 /* PINDiskCache.m */; };
+		377C90361CB6B42C00146985 /* PINDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 377C90331CB6B42C00146985 /* PINDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		377C90371CB6B42C00146985 /* Nullability.h in Headers */ = {isa = PBXBuildFile; fileRef = 377C90341CB6B42C00146985 /* Nullability.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37A2D0F8493469EF2495FC689440F079 /* EXPMatchers+beLessThanOrEqualTo.h in Headers */ = {isa = PBXBuildFile; fileRef = AB2DADCEEF4EB97FC102ACCDF8FB51E9 /* EXPMatchers+beLessThanOrEqualTo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3856B94C2DDE0D2E4EE78B7E7B296C40 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CF084266D04F9AD0F1FFD71C6AFC3FF /* Foundation.framework */; };
 		385E0C8625F730CB397EBEEAF477AD4D /* SPTTestSuite.h in Headers */ = {isa = PBXBuildFile; fileRef = BEC4D7D2259B4B710DED71BD7949BACA /* SPTTestSuite.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -272,6 +275,9 @@
 		32B8942A98D0863FA360DE7F5E75445B /* HYCache.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = HYCache.modulemap; sourceTree = "<group>"; };
 		33C35331B5791C85920198E31A6E6396 /* XCTestCase+Specta.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "XCTestCase+Specta.m"; path = "Specta/Specta/XCTestCase+Specta.m"; sourceTree = "<group>"; };
 		370C8488ABDC015700FCF97F059BFD42 /* Expecta-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Expecta-umbrella.h"; sourceTree = "<group>"; };
+		377C90321CB6B42C00146985 /* PINDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINDiskCache.m; sourceTree = "<group>"; };
+		377C90331CB6B42C00146985 /* PINDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINDiskCache.h; sourceTree = "<group>"; };
+		377C90341CB6B42C00146985 /* Nullability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullability.h; sourceTree = "<group>"; };
 		38D55BF5B79C4ACFAC741FC2A1B3BEAC /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		3A35BE0267849F84514C1480B43A470C /* SPTCompiledExample.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTCompiledExample.h; path = Specta/Specta/SPTCompiledExample.h; sourceTree = "<group>"; };
 		3BC296A75FAF73BAC957A272364A7351 /* EXPMatchers+raiseWithReason.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "EXPMatchers+raiseWithReason.m"; path = "Expecta/Matchers/EXPMatchers+raiseWithReason.m"; sourceTree = "<group>"; };
@@ -512,6 +518,9 @@
 		1922ED2492F2CD5F07BAE0E198724705 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				377C90321CB6B42C00146985 /* PINDiskCache.m */,
+				377C90331CB6B42C00146985 /* PINDiskCache.h */,
+				377C90341CB6B42C00146985 /* Nullability.h */,
 				E47922AA0F6D472C6BD29B15DF2DE148 /* Expecta.framework */,
 				C93D23F4DB7569CC800036F3F8FAFE2E /* FBSnapshotTestCase.framework */,
 				3C69DF8F7AD5A0ABA3453069F77F5742 /* Specta.framework */,
@@ -916,7 +925,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				04DCD55ECD96DF0EA76D661B94646EBA /* HYCache-umbrella.h in Headers */,
+				377C90371CB6B42C00146985 /* Nullability.h in Headers */,
 				94544E85BF013F6F10BEE9F44128D55D /* HYDiskCache.h in Headers */,
+				377C90361CB6B42C00146985 /* PINDiskCache.h in Headers */,
 				89CB2BE3A727B4AFDFA1A5B9FBFCEBEF /* HYMemoryCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1274,6 +1285,7 @@
 				7EA9EDF077D5ACDC08AC4B4B2F6E838A /* HYCache-dummy.m in Sources */,
 				5268FDD21B72D8573466B0E77265CB34 /* HYDiskCache.m in Sources */,
 				A325ED18A7666A550C9AB3EF5CD919A8 /* HYMemoryCache.m in Sources */,
+				377C90351CB6B42C00146985 /* PINDiskCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
