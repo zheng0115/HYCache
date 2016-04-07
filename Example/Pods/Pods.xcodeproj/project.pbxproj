@@ -757,8 +757,8 @@
 		7E8CA60E1F11EFE2495CE6AEDA41CAA0 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				99BD55F06B2AC12869113CF2F3962215 /* HYMemoryCache */,
 				5705CB45698DF4654FA5CC73899DFC3C /* HYDiskCache */,
+				99BD55F06B2AC12869113CF2F3962215 /* HYMemoryCache */,
 			);
 			path = Classes;
 			sourceTree = "<group>";

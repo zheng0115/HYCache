@@ -8,10 +8,13 @@
 
 #import "HYViewController.h"
 #import "HYMemoryCache.h"
+#import "HYDiskCache.h"
 
 @interface HYViewController ()
 {
-    HYMemoryCache *_cache;
+    HYMemoryCache *_memcache;
+    HYDiskCache *_diskCache;
+    
     NSMutableArray *_keys;
     NSMutableArray *_values;
     dispatch_queue_t queue;
@@ -28,9 +31,11 @@
     
     queue = dispatch_queue_create([@"test queue" UTF8String], DISPATCH_QUEUE_CONCURRENT);
     
-    _cache = [[HYMemoryCache alloc] initWithName:@"fangyuxi"];
-    _cache.maxAge = 5.0f;
-    _cache.trimToMaxAgeInterval = 10.0f;
+    _memcache = [[HYMemoryCache alloc] initWithName:@"fangyuxi"];
+    _memcache.maxAge = 5.0f;
+    _memcache.trimToMaxAgeInterval = 10.0f;
+    
+    _diskCache = [[HYDiskCache alloc] initWithName:@"fangyuxi"];
     
     _keys = [NSMutableArray array];
     _values = [NSMutableArray array];
@@ -38,15 +43,35 @@
     for (NSInteger index = 0; index < 200000; ++index)
     {
         [_keys addObject:@(index)];
-        [_values addObject:@(index)];
+        [_values addObject:[UIImage imageNamed:@"bid"]];
     }
     
-    [self testSet];
+    [self testDiskSet];
     //[self testRemove];
     //[self testTrimCost];
 }
 
-- (void)testSet
+- (void)testDiskSet
+{
+    CFTimeInterval start = CACurrentMediaTime();
+    for (NSInteger index = 0; index < 50; ++index)
+    {
+        [_diskCache setObject:[_values objectAtIndex:index] forKey:[[_keys objectAtIndex:index] stringValue] withBlock:^(HYDiskCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                        NSLog(@"Finish %@", key);
+                    });
+            
+        }];
+    }
+    CFTimeInterval finish = CACurrentMediaTime();
+    
+    CFTimeInterval f = finish - start;
+    printf("set:   %8.2f\n", f * 1000);
+}
+
+- (void)testMemSet
 {
     CFTimeInterval start = CACurrentMediaTime();
     for (NSInteger index = 0; index < 200000; ++index)
@@ -63,7 +88,7 @@
         //            }];
         //        });
         
-        [_cache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index] withCost:index];
+        [_memcache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index] withCost:index];
     }
     CFTimeInterval finish = CACurrentMediaTime();
     
@@ -103,15 +128,15 @@
 
 - (void)testTrimCost
 {
-    [_cache trimToCost:1000 block:^(HYMemoryCache * _Nonnull cache) {
-       
-        
-    }];
-    
-    [_cache trimToCost:500 block:^(HYMemoryCache * _Nonnull cache) {
-        
-        
-    }];
+//    [_cache trimToCost:1000 block:^(HYMemoryCache * _Nonnull cache) {
+//       
+//        
+//    }];
+//    
+//    [_cache trimToCost:500 block:^(HYMemoryCache * _Nonnull cache) {
+//        
+//        
+//    }];
 }
 
 - (void)didReceiveMemoryWarning

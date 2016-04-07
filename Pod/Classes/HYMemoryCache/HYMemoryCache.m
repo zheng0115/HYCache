@@ -10,7 +10,7 @@
 #import <pthread.h>
 #import <libkern/OSAtomic.h>
 
-static NSString *const queueNamePrefix = @"com.HYCache.";
+static NSString *const queueNamePrefix = @"com.HYMemCache.";
 static OSSpinLock mutexLock;
 
 #pragma mark lock
