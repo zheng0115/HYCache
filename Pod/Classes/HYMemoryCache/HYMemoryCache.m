@@ -70,7 +70,7 @@ static inline void unLock()
 @property (nonatomic, strong) dispatch_queue_t concurrentQueue;
 @property (nonatomic, copy, readwrite) NSString *name;
 
-inline _HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key);
+inline _HYMemoryCacheItem * p_itemForKey(CFMutableDictionaryRef objectDic,  id key);
 inline NSArray * p_keySortedByInCacheDate(CFMutableDictionaryRef _objectDic);
 
 @end
@@ -200,7 +200,7 @@ inline NSArray * p_keySortedByInCacheDate(CFMutableDictionaryRef _objectDic);
 {
     if (!object || !key) return;
     
-    _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
+    _HYMemoryCacheItem *item = p_itemForKey(_objectDic, key);
     lock();
     if (item)
     {
@@ -228,10 +228,17 @@ inline NSArray * p_keySortedByInCacheDate(CFMutableDictionaryRef _objectDic);
 - (id __nullable )objectForKey:(id)key
 {
     if (!key) return nil;
+    lock();
+    NSTimeInterval maxAge = _maxAge;
+    unLock();
     
-    _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
+    _HYMemoryCacheItem *item = p_itemForKey(_objectDic, key);
     
-    if (item) return item->_object;
+    NSTimeInterval now = CACurrentMediaTime();
+    
+    //即使对象存在，但是超出了maxAge没来得及清理，那么也是NO
+    if (item != nil && maxAge==0 ? YES : now - item->_age < maxAge)
+        return item->_object;
     return nil;
 }
 
@@ -252,7 +259,7 @@ inline NSArray * p_keySortedByInCacheDate(CFMutableDictionaryRef _objectDic);
     });
 }
 
-_HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key)
+_HYMemoryCacheItem * p_itemForKey(CFMutableDictionaryRef objectDic,  id key)
 {
     lock();
     _HYMemoryCacheItem *item = CFDictionaryGetValue(objectDic, (__bridge const void *)key);
@@ -270,7 +277,7 @@ _HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key)
         
         HYMemoryCache *stronglySelf = weakSelf;
         
-        _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
+        _HYMemoryCacheItem *item = p_itemForKey(_objectDic, key);
         [self removeObjectForKey:key];
         
         if (block)
@@ -324,12 +331,14 @@ _HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key)
 - (BOOL)containsObjectForKey:(id)key
 {
     if (!key) return NO;
-    
     lock();
-    _HYMemoryCacheItem *item = CFDictionaryGetValue(_objectDic, (__bridge const void *)key);
+    NSTimeInterval maxAge = _maxAge;
     unLock();
     
-    return item != nil;
+    _HYMemoryCacheItem *item = p_itemForKey(_objectDic, key);
+    NSTimeInterval now = CACurrentMediaTime();
+    //即使对象存在，但是超出了maxAge没来得及清理，那么也是NO
+    return item != nil && maxAge==0 ? YES : now - item->_age < maxAge;
 }
 
 #pragma mark trim value
@@ -416,7 +425,7 @@ _HYMemoryCacheItem * itemForKey(CFMutableDictionaryRef objectDic,  id key)
     
     for (NSString *key in [keys reverseObjectEnumerator])// old objects first
     {
-        _HYMemoryCacheItem *item = itemForKey(_objectDic, key);
+        _HYMemoryCacheItem *item = p_itemForKey(_objectDic, key);
         if (item)
         {
             NSTimeInterval now = CACurrentMediaTime();
