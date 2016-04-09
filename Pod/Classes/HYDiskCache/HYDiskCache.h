@@ -8,6 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
+///benckMark
+
+// SmallValue 1000 key-value  value = NSNumber
+
+// Write 8909.52
+// replace 6105.77
+
+
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class HYDiskCache;
@@ -27,7 +36,8 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
 
 @property (nonatomic, copy, readonly) NSString *name;
 @property (nonatomic, copy, readonly) NSString *directoryPath;
-@property (nonatomic, copy, readonly) NSURL *cachePath;
+@property (nonatomic, copy, readonly) NSString *cachePath;
+
 /**
  *  当前的cost
  */
@@ -73,6 +83,24 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
  */
 - (void)setObject:(id<NSCoding>)object
            forKey:(NSString *)key;
+
+/**
+ *  同步获取对象，该方法会阻塞调用的线程，直到获取完成
+ *
+ *  @param key 存储对象的键，不能为空
+ *
+ *  @return 如果没找到相应object则返回空
+ */
+- (id __nullable )objectForKey:(NSString *)key;
+
+/**
+ *  异步获取对象，该方法会立即返回，获取完毕之后block会在内部的concurrent queue中回调
+ *
+ *  @param key   存储对象的键，不能为空
+ *  @param block 返回值 key object  cache object
+ */
+- (void)objectForKey:(id)key
+           withBlock:(HYDiskCacheObjectBlock)block;
 
 @end
 

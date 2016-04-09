@@ -43,13 +43,15 @@
     _keys = [NSMutableArray array];
     _values = [NSMutableArray array];
     
-    for (NSInteger index = 0; index < 200000; ++index)
+    for (NSInteger index = 0; index < 1000; ++index)
     {
-        [_keys addObject:@(index)];
-        [_values addObject:[UIImage imageNamed:@"bid"]];
+        [_keys addObject:[NSString stringWithFormat:@"%d", index]];
+        //[_values addObject:[NSNumber numberWithInt:100]];
     }
     
-    [self testDiskSet];
+    //[self testDiskSet];
+    [self testReadDisk];
+    
     //[self testRemove];
     //[self testTrimCost];
 }
@@ -57,14 +59,37 @@
 - (void)testDiskSet
 {
     CFTimeInterval start = CACurrentMediaTime();
-    for (NSInteger index = 0; index < 50; ++index)
+    for (NSInteger index = 0; index < 1000; ++index)
     {
-        [_diskCache setObject:[_values objectAtIndex:index] forKey:[[_keys objectAtIndex:index] stringValue]];
+        [_diskCache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
     }
     CFTimeInterval finish = CACurrentMediaTime();
     
     CFTimeInterval f = finish - start;
-    printf("set:   %8.2f\n", f * 1000);
+    printf("set disk:   %8.2f\n", f * 1000);
+}
+
+- (void)testReadDisk
+{
+     CFTimeInterval start = CACurrentMediaTime();
+    for (NSInteger index = 0; index < 1000; ++index)
+    {
+//        dispatch_async(queue, ^{
+//
+//            [_diskCache objectForKey:[_keys objectAtIndex:index] withBlock:^(HYDiskCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+//                
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    
+//                    NSLog(@"Finish %@", object);
+//                });
+//            }];
+//        });
+        [_diskCache objectForKey:[_keys objectAtIndex:index]];
+    }
+    CFTimeInterval finish = CACurrentMediaTime();
+    
+    CFTimeInterval f = finish - start;
+    printf("read disk:   %8.2f\n", f * 1000);
 }
 
 - (void)testMemSet
