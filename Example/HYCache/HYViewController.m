@@ -56,6 +56,7 @@
     //[self testDiskSet];
     //[self testDiskRemove];
     //[self testTrimCost];
+    [self testTrimDiskCost];
 }
 
 - (void)testDiskSet
@@ -69,13 +70,6 @@
         [_diskCache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
     }
     
-//    for (NSInteger index = 0; index < 1000; ++index)
-//    {
-//        dispatch_sync(queue2, ^{
-//            
-//            [_diskCache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
-//        });
-//    }
     CFTimeInterval finish = CACurrentMediaTime();
     
     CFTimeInterval f = finish - start;
@@ -90,30 +84,9 @@
     CFTimeInterval start = CACurrentMediaTime();
     for (NSInteger index = 0; index < 1000; ++index)
     {
-        dispatch_async(queue1, ^{
-          
-            id object =  [_diskCache objectForKey:[_keys objectAtIndex:index]];
-            
-            [_diskCache removeObjectForKey:[_keys objectAtIndex:index]];
-            dispatch_async(dispatch_get_main_queue(), ^{
-               
-                NSLog(@"%@", object);
-            });
-        });
+        [_diskCache objectForKey:[_keys objectAtIndex:index]];
     }
     
-    for (NSInteger index = 999; index == 0; --index)
-    {
-        dispatch_async(queue2, ^{
-            
-            id object =  [_diskCache objectForKey:[_keys objectAtIndex:index]];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                NSLog(@"%@", object);
-            });
-        });
-    }
     CFTimeInterval finish = CACurrentMediaTime();
     
     CFTimeInterval f = finish - start;
@@ -133,23 +106,22 @@
     printf("read disk:   %8.2f\n", f * 1000);
 }
 
+- (void)testTrimDiskCost
+{
+    CFTimeInterval start = CACurrentMediaTime();
+    [_diskCache trimToCost:500 block:^(HYDiskCache * _Nonnull cache) {
+        
+    }];
+    CFTimeInterval finish = CACurrentMediaTime();
+    
+    CFTimeInterval f = finish - start;
+    printf("trim disk:   %8.2f\n", f * 1000);
+}
 - (void)testMemSet
 {
     CFTimeInterval start = CACurrentMediaTime();
     for (NSInteger index = 0; index < 200000; ++index)
     {
-        //        dispatch_async(queue, ^{
-        //
-        //            [cache setObject:[values objectAtIndex:index] forKey:[keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-        //
-        //                dispatch_async(dispatch_get_main_queue(), ^{
-        //
-        //                    NSLog(@"Finish %@", object);
-        //                });
-        //
-        //            }];
-        //        });
-        
         [_memcache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index] withCost:index];
     }
     CFTimeInterval finish = CACurrentMediaTime();
@@ -191,17 +163,9 @@
 
 }
 
-- (void)testTrimCost
+- (void)testTrimMemCost
 {
-//    [_cache trimToCost:1000 block:^(HYMemoryCache * _Nonnull cache) {
-//       
-//        
-//    }];
-//    
-//    [_cache trimToCost:500 block:^(HYMemoryCache * _Nonnull cache) {
-//        
-//        
-//    }];
+
 }
 
 - (void)didReceiveMemoryWarning

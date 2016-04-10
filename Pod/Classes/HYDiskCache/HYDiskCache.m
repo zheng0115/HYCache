@@ -78,7 +78,7 @@ static inline void unLock()
 ///////////////////////////////////////////////////////////////////////////////
 #pragma mark linked map used for LRU
 ///////////////////////////////////////////////////////////////////////////////
-@interface _HYDiskCacheItem : NSObject
+@interface _HYDiskCacheItem : NSObject // not thread-safe
 {
     @package
     NSString *key;
@@ -121,7 +121,7 @@ static inline void unLock()
 
 @end
 
-@interface _HYDiskCacheItemLinkMap : NSObject
+@interface _HYDiskCacheItemLinkMap : NSObject //not thread-safe
 {
     @package
     __unsafe_unretained _HYDiskCacheItem *_head;
@@ -137,7 +137,7 @@ static inline void unLock()
 
 - (void)_removeItem:(_HYDiskCacheItem *)item;
 
-- (void)_removeTailItem;
+- (_HYDiskCacheItem *)_removeTailItem;
 
 - (void)_removeAllItem;
 
@@ -216,8 +216,9 @@ static inline void unLock()
     _totalByteCost = _totalByteCost - item->byteCost;
 }
 
-- (void)_removeTailItem
+- (_HYDiskCacheItem *)_removeTailItem
 {
+    _HYDiskCacheItem *item = _tail;
     if (_head == _tail)
     {
         _head = _tail = nil;
@@ -230,7 +231,7 @@ static inline void unLock()
     
     CFDictionaryRemoveValue(_itemsDic, (__bridge const void *)_tail->key);
     _totalByteCost = _totalByteCost - _tail->byteCost;
-    return;
+    return item;
 }
 
 - (void)_removeAllItem
@@ -247,7 +248,7 @@ static inline void unLock()
 #pragma mark HYDiskStorage
 ///////////////////////////////////////////////////////////////////////////////
 
-@interface _HYDiskFileStorage : NSObject
+@interface _HYDiskFileStorage : NSObject //not thread-safe
 {
     @package
     //CFMutableDictionaryRef _itemsDic;
@@ -321,14 +322,20 @@ inline void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCa
     item->lastAccessDate = [NSDate distantFuture];//暂无访问
     item->fileName = [self _p_fileNameForKey:item->key];
     
-    if (!alreadyHas)
-        [_lruMap _insertItemAtHead:item];
-    else
-        [_lruMap _bringItemToHead:item];
     BOOL writeResult = [self _p_fileWriteWithName:item->fileName data:value];
     BOOL setTimeResult = [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
-    if (!setTimeResult)//访问时间插入失败，删除刚刚写入的文件返回NO
+    if (!setTimeResult)//访问时间插入失败，删除刚刚写入的文件
+    {
         [self _p_fileDeleteWithName:item->fileName];
+    }
+    else
+    {
+        if (!alreadyHas)
+            [_lruMap _insertItemAtHead:item];
+        else
+            [_lruMap _bringItemToHead:item];
+    }
+    
     return writeResult && setTimeResult;
 }
 
@@ -343,6 +350,8 @@ inline void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCa
     if (data)
     {
         [self _p_setFileAccessDate:[NSDate date] forFileName:item->fileName];
+        item->lastAccessDate = [NSDate date];
+        [_lruMap _bringItemToHead:item];
         return data;
     }
     return nil;
@@ -481,6 +490,7 @@ _HYDiskCacheItem * _p_itemForKey(NSString *key, _HYDiskCacheItemLinkMap *map)
 {
     if (key)
         return CFDictionaryGetValue(map->_itemsDic, (__bridge const void*)key);
+    return nil;
 }
 
 void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem *item)
@@ -541,7 +551,7 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
 #pragma mark HYDiskCache
 ///////////////////////////////////////////////////////////////////////////////
 
-@interface HYDiskCache ()
+@interface HYDiskCache () // yeah all method & proterty thread-safe
 {
     dispatch_queue_t _dataQueue;
     _HYDiskFileStorage *_storage;
@@ -560,6 +570,10 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
 @synthesize byteCostLimit = _byteCostLimit;
 @synthesize totalByteCostNow = _totalByteCostNow;
 @synthesize maxAge = _maxAge;
+@synthesize trimToMaxAgeInterval = _trimToMaxAgeInterval;
+@synthesize customArchiveBlock = _customArchiveBlock;
+@synthesize customUnarchiveBlock = _customUnarchiveBlock;
+@synthesize customMaxAge = _customMaxAge;
 
 - (instancetype)init
 {
@@ -785,6 +799,152 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
     lock();
     [_storage _removeAllValues];
     unLock();
+}
+
+- (void)containsObjectForKey:(id)key
+                       block:(nullable HYDiskCacheObjectBlock)block
+{
+    if (!key) return ;
+    [self objectForKey:key withBlock:block];
+}
+
+- (void)trimToCost:(NSUInteger)cost
+             block:(nullable HYDiskCacheBlock)block;
+{
+    if (cost == 0)
+    {
+        [self removeAllObjectWithBlock:block];
+    }
+    else if (cost < self.totalByteCostNow)
+    {
+        __weak HYDiskCache *weakSelf = self;
+        dispatch_async(_dataQueue, ^{
+           
+            __strong HYDiskCache *stronglySelf = weakSelf;
+            lock();
+            //do not use self.totalByteCostNow  avoid deadlock
+            while (cost <= _storage->_lruMap->_totalByteCost)
+            {
+                _HYDiskCacheItem *item = _storage->_lruMap->_tail;
+                if (item)
+                {
+                    [_storage _removeValueForKey:item->key];
+                }
+            }
+            unLock();
+            
+            if (block)
+                block(stronglySelf);
+        });
+    }
+    return;
+}
+
+- (void)trimToCostLimitWithBlock:(nullable HYDiskCacheBlock)block
+{
+    [self trimToCost:self.byteCostLimit block:block];
+}
+
+#pragma mark getter setter for thread-safe
+
+- (NSUInteger)totalByteCostNow
+{
+    lock();
+    NSUInteger cost = _storage->_lruMap->_totalByteCost;
+    unLock();
+    return cost;
+}
+
+- (NSUInteger)byteCostLimit
+{
+    lock();
+    NSUInteger cost = _byteCostLimit;
+    unLock();
+    
+    return cost;
+}
+
+- (void)setByteCostLimit:(NSUInteger)byteCostLimit
+{
+    lock();
+    _byteCostLimit = byteCostLimit;
+    unLock();
+}
+
+- (NSTimeInterval)maxAge
+{
+    lock();
+    NSTimeInterval age = _maxAge;
+    unLock();
+    return age;
+}
+
+- (void)setMaxAge:(NSTimeInterval)maxAge
+{
+    lock();
+    _maxAge = maxAge;
+    unLock();
+}
+
+- (void)setTrimToMaxAgeInterval:(NSTimeInterval)trimToMaxAgeInterval
+{
+    lock();
+    _trimToMaxAgeInterval = trimToMaxAgeInterval;
+    unLock();
+}
+
+- (NSTimeInterval)trimToMaxAgeInterval
+{
+    lock();
+    NSTimeInterval age = _trimToMaxAgeInterval;
+    unLock();
+    
+    return age;
+}
+
+- (void)setCustomArchiveBlock:(NSData * _Nonnull (^)(id _Nonnull))customArchiveBlock
+{
+    lock();
+    _customArchiveBlock = [customArchiveBlock copy];
+    unLock();
+}
+
+- (NSData * _Nonnull(^)(id _Nonnull))customArchiveBlock
+{
+    lock();
+    NSData *(^block)(id)  = _customArchiveBlock;
+    unLock();
+    return block;
+}
+
+- (void)setCustomUnarchiveBlock:(id  _Nonnull (^)(NSData * _Nonnull))customUnarchiveBlock
+{
+    lock();
+    _customUnarchiveBlock = [customUnarchiveBlock copy];
+    unLock();
+}
+
+- (id (^)(NSData *))customUnarchiveBlock
+{
+    lock();
+    id (^block)(NSData *) = _customUnarchiveBlock;
+    unLock();
+    return block;
+}
+
+- (void)setCustomMaxAge:(NSTimeInterval (^)(id _Nonnull))customMaxAge
+{
+    lock();
+    _customMaxAge = [customMaxAge copy];
+    unLock();
+}
+
+- (NSTimeInterval (^)(id))customMaxAge
+{
+    lock();
+    NSTimeInterval (^block)(id) = _customMaxAge;
+    unLock();
+    return block;
 }
 
 @end

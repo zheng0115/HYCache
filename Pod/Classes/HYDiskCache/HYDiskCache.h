@@ -12,9 +12,9 @@
 
 // SmallValue 1000 key-value  value = NSNumber
 
-// Write 8909.52
-// replace 6105.77
-// remove 128.00
+// Write 8909.52 ms
+// replace 6105.77 ms
+// remove 128.00 ms
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^HYDiskCacheBlock) (HYDiskCache *cache);
 typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __nullable object);
 
-@interface HYDiskCache : NSObject
+@interface HYDiskCache : NSObject // all method & proterty thread-safe
 
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 + (instancetype)new UNAVAILABLE_ATTRIBUTE;
@@ -54,15 +54,22 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
 @property (nonatomic, assign) NSTimeInterval maxAge;
 
 /**
- *  如果maxAge不为0，那么cache会定时移除生命周期已经大于maxAge的对象
+ *  如果maxAge不为0，那么cache会定时移除生命周期已经大于maxAge以及customAge的对象
     如果maxAge为0，则忽略这个属性
  */
 @property (nonatomic, assign) NSTimeInterval trimToMaxAgeInterval;
 
-
+/**
+ *  对于没有遵循NSCoding协议的一类对象，可以在这个block中定义自己的archive逻辑
+ */
 @property (nullable, copy) NSData *(^customArchiveBlock)(id object);
 
 @property (nullable, copy) id (^customUnarchiveBlock)(NSData *data);
+
+/**
+ *  可以自定义一类对象的maxAge，如果一类对象自定义了maxAge，那么会覆盖上面cache 的 maxAge
+ */
+@property (nonatomic, copy) NSTimeInterval (^customMaxAge)(id object);
 
 /**
  *  异步存储对象，该方法会立即返回，添加完毕之后block会在内部的concurrent queue中回调
@@ -139,6 +146,32 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
  *  同步移除所有对象
  */
 - (void)removeAllObject;
+
+/**
+ *  查询是否包含这个key value
+ *
+ *  @param key 存储对象的键，不能为空
+ *
+ *  @return 如果有，那么block中的object对象不为空
+ */
+- (void)containsObjectForKey:(id)key
+                       block:(nullable HYDiskCacheObjectBlock)block;
+
+/**
+ *  移除对象，直到totalCostNow <= cost
+ *
+ *  @param cost  cost
+ *  @param block 移除完毕之后block会在内部的concurrent queue中回调
+ */
+- (void)trimToCost:(NSUInteger)cost
+             block:(nullable HYDiskCacheBlock)block;
+
+/**
+ *  移除对象，直到totalCostNow <= costLimit
+ *
+ *  @param block 移除完毕之后block会在内部的concurrent queue中回调
+ */
+- (void)trimToCostLimitWithBlock:(nullable HYDiskCacheBlock)block;
 
 @end
 
