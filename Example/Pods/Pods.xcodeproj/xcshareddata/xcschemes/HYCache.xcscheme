@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '277B79147674494AED91D9F3'
-               BlueprintName = 'HYCache'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'HYCache.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9867252139CFD055A332EE85D4379C3A"
+               BlueprintName = "HYCache"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "HYCache.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

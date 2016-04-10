@@ -14,7 +14,7 @@
 
 // Write 8909.52
 // replace 6105.77
-
+// remove 128.00
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -39,9 +39,10 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
 @property (nonatomic, copy, readonly) NSString *cachePath;
 
 /**
- *  当前的cost
+ *  当前的cost，当超过byteCostLimit的时候，移除策略为LRU
  */
 @property (nonatomic, assign, readonly) NSUInteger totalByteCostNow;
+
 /**
  *  设置最大cost
  */
@@ -76,13 +77,22 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
         withBlock:(__nullable HYDiskCacheObjectBlock)block;
 
 /**
- *  同步存储对象，该方法会阻塞调用的线程，直到存储完成
+ *  同步移除对象
  *
  *  @param object 存储的对象，如果为空，则不会插入
  *  @param key    存储对象的键，如果为空，则不会插入
  */
 - (void)setObject:(id<NSCoding>)object
            forKey:(NSString *)key;
+
+/**
+ *  异步获取对象，该方法会立即返回，获取完毕之后block会在内部的concurrent queue中回调
+ *
+ *  @param key   存储对象的键，不能为空
+ *  @param block 返回值 key object  cache object
+ */
+- (void)objectForKey:(id)key
+           withBlock:(HYDiskCacheObjectBlock)block;
 
 /**
  *  同步获取对象，该方法会阻塞调用的线程，直到获取完成
@@ -94,14 +104,54 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
 - (id __nullable )objectForKey:(NSString *)key;
 
 /**
- *  异步获取对象，该方法会立即返回，获取完毕之后block会在内部的concurrent queue中回调
+ *  异步移除对象，移除完毕之后block会在内部的concurrent queue中回调
  *
  *  @param key   存储对象的键，不能为空
- *  @param block 返回值 key object  cache object
+ *  @param block 返回值 cache object
  */
-- (void)objectForKey:(id)key
-           withBlock:(HYDiskCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key
+                 withBlock:(__nullable HYDiskCacheBlock)block;
+
+/**
+ *  同步移除对象
+ *
+ *  @param key 存储对象的键，不能为空
+ */
+- (void)removeObjectForKey:(NSString *)key;
+
+/**
+ *  异步移除一组对象，移除完毕之后block会在内部的concurrent queue中回调
+ *
+ *  @param key   存储对象的键，不能为空
+ *  @param block 返回值 cache object
+ */
+- (void)removeObjectForKeys:(NSArray<NSString *> *)keys
+                  withBlock:(__nullable HYDiskCacheBlock)block;
+
+/**
+ *  异步移除所有对象，移除完毕之后block会在内部的concurrent queue中回调
+ *
+ *  @param block 返回值 cache object
+ */
+- (void)removeAllObjectWithBlock:(__nullable HYDiskCacheBlock)block;
+
+/**
+ *  同步移除所有对象
+ */
+- (void)removeAllObject;
 
 @end
 
 NS_ASSUME_NONNULL_END
+
+
+
+
+
+
+
+
+
+
+
+

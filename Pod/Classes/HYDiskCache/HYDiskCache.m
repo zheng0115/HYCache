@@ -76,7 +76,7 @@ static inline void unLock()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#pragma mark HYDiskCacheItem
+#pragma mark linked map used for LRU
 ///////////////////////////////////////////////////////////////////////////////
 @interface _HYDiskCacheItem : NSObject
 {
@@ -87,11 +87,159 @@ static inline void unLock()
     NSDate *inCacheDate;
     NSDate *lastAccessDate;
     NSString *fileName;
+    
+    __unsafe_unretained _HYDiskCacheItem *preItem;
+    __unsafe_unretained _HYDiskCacheItem *nextItem;
 }
+
+- (NSComparisonResult)compare:(_HYDiskCacheItem *)cacheItem;
 
 @end
 
 @implementation _HYDiskCacheItem
+
+- (NSComparisonResult)compare:(_HYDiskCacheItem *)cacheItem
+{
+    if (!cacheItem) return NSOrderedSame;
+    NSTimeInterval me = [lastAccessDate timeIntervalSince1970];
+    NSTimeInterval you = [cacheItem->lastAccessDate timeIntervalSince1970];
+    if (me < you)
+    {
+        return NSOrderedAscending;
+    }
+    else if (me > you)
+    {
+        return NSOrderedDescending;
+    }
+    return NSOrderedSame;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"key:%@ inCachedate:%@ lastAccessDate %@",key,inCacheDate, lastAccessDate];
+}
+
+@end
+
+@interface _HYDiskCacheItemLinkMap : NSObject
+{
+    @package
+    __unsafe_unretained _HYDiskCacheItem *_head;
+    __unsafe_unretained _HYDiskCacheItem *_tail;
+    
+    CFMutableDictionaryRef _itemsDic;
+    NSUInteger _totalByteCost;
+}
+
+- (void)_insertItemAtHead:(_HYDiskCacheItem *)item;
+
+- (void)_bringItemToHead:(_HYDiskCacheItem *)item;
+
+- (void)_removeItem:(_HYDiskCacheItem *)item;
+
+- (void)_removeTailItem;
+
+- (void)_removeAllItem;
+
+@end
+
+@implementation _HYDiskCacheItemLinkMap
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        _itemsDic = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,&kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        _totalByteCost = 0;
+        _head = nil;
+        _tail = nil;
+        
+        return self;
+    }
+    return nil;
+}
+
+- (void)_insertItemAtHead:(_HYDiskCacheItem *)item
+{
+    CFDictionarySetValue(_itemsDic, (__bridge const void *)item->key, (__bridge const void *)item);
+    _totalByteCost = _totalByteCost + item->byteCost;
+    if (_head)
+    {
+        _head->preItem = item;
+        item->nextItem = _head;
+        item->preItem = nil;
+        _head = item;
+    }
+    else
+    {
+        _head = item;
+        _tail = item;
+        _head = _tail;
+    }
+}
+
+- (void)_bringItemToHead:(_HYDiskCacheItem *)item
+{
+    if (_head == item) return;
+    
+    if (_tail == item)
+    {
+        _tail = item->preItem;
+        _tail->nextItem = nil;
+    }
+    else
+    {
+        item->nextItem->preItem = item->preItem;
+        item->preItem->nextItem = item->nextItem;
+    }
+    
+    item->nextItem = _head;
+    item->preItem = nil;
+    _head->preItem = item;
+    _head = item;
+}
+
+- (void)_removeItem:(_HYDiskCacheItem *)item
+{
+    if (item->nextItem)
+        item->nextItem->preItem = item->preItem;
+    if (item->preItem)
+        item->preItem->nextItem = item->nextItem;
+    
+    if (_head == item)
+        _head = item->preItem;
+    if (_tail == item)
+        _tail = item->preItem;
+    
+    CFDictionaryRemoveValue(_itemsDic, (__bridge const void *)item->key);
+    _totalByteCost = _totalByteCost - item->byteCost;
+}
+
+- (void)_removeTailItem
+{
+    if (_head == _tail)
+    {
+        _head = _tail = nil;
+    }
+    else
+    {
+        _tail = _tail->preItem;
+        _tail->nextItem = nil;
+    }
+    
+    CFDictionaryRemoveValue(_itemsDic, (__bridge const void *)_tail->key);
+    _totalByteCost = _totalByteCost - _tail->byteCost;
+    return;
+}
+
+- (void)_removeAllItem
+{
+    _head = nil;
+    _tail = nil;
+    CFDictionaryRemoveAllValues(_itemsDic);
+    _totalByteCost = 0;
+}
 
 @end
 
@@ -102,7 +250,8 @@ static inline void unLock()
 @interface _HYDiskFileStorage : NSObject
 {
     @package
-    CFMutableDictionaryRef _itemsDic;
+    //CFMutableDictionaryRef _itemsDic;
+    _HYDiskCacheItemLinkMap *_lruMap;
     NSString *_dataPath;
     NSString *_trashPath;
 }
@@ -110,7 +259,6 @@ static inline void unLock()
 - (instancetype)initWithPath:(NSString *)path
                    trashPath:(NSString *)trashPath NS_DESIGNATED_INITIALIZER;
 
-- (BOOL)_saveItem:(_HYDiskCacheItem *)item;
 - (BOOL)_saveCacheValue:(NSData *)value key:(NSString *)key;
 
 - (NSData *)_cacheValueForKey:(NSString *)key;
@@ -119,8 +267,8 @@ static inline void unLock()
 - (BOOL)_removeValueForKeys:(NSArray<NSString *> *)keys;
 - (BOOL)_removeAllValues;
 
-inline _HYDiskCacheItem *_p_itemForKey(NSString *key, CFMutableDictionaryRef dic);
-inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
+inline _HYDiskCacheItem *_p_itemForKey(NSString *key, _HYDiskCacheItemLinkMap *map);
+inline void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem *item);
 
 @end
 
@@ -128,7 +276,7 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
 
 - (void)dealloc
 {
-    CFRelease(_itemsDic);
+    
 }
 
 - (instancetype)init
@@ -144,35 +292,13 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
     {
         _dataPath = path;
         _trashPath = trashPath;
-        _itemsDic = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0,&kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        _lruMap = [_HYDiskCacheItemLinkMap new];
         [self _p_initializeFileCacheRecord];
         return self;
     }
     return nil;
 }
 
-- (BOOL)_saveItem:(_HYDiskCacheItem *)item
-{
-    if (!item || ![item isKindOfClass:[_HYDiskCacheItem class]])
-        return NO;
-    if (item->value.length == 0 || item->key.length == 0)
-        return NO;
-    
-    if (item->fileName.length == 0)
-        item->fileName = [self _p_fileNameForKey:item->key];
-    if (item->byteCost == 0)
-        item->byteCost = item->value.length;
-
-    item->inCacheDate = [NSDate date];
-    item->lastAccessDate = [NSDate distantFuture];//暂无访问
-    
-    CFDictionarySetValue(_itemsDic, (__bridge const void*)item->key, (__bridge const void*)item);
-    BOOL writeResult = [self _p_fileWriteWithName:item->fileName data:item->value];
-    BOOL setTimeResult = [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
-    if (!setTimeResult)
-        [self _p_fileDeleteWithName:item->fileName];
-    return writeResult && setTimeResult;
-}
 - (BOOL)_saveCacheValue:(NSData *)value key:(NSString *)key
 {
     if (key.length == 0)
@@ -181,7 +307,7 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
         return NO;
     
     BOOL alreadyHas = YES;
-    _HYDiskCacheItem *item = CFDictionaryGetValue(_itemsDic, (__bridge const void*)key);
+    _HYDiskCacheItem *item = CFDictionaryGetValue(_lruMap->_itemsDic, (__bridge const void*)key);
     if (!item)
     {
         alreadyHas = NO;
@@ -196,10 +322,12 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
     item->fileName = [self _p_fileNameForKey:item->key];
     
     if (!alreadyHas)
-        CFDictionarySetValue(_itemsDic, (__bridge const void*)item->key, (__bridge const void*)item);
+        [_lruMap _insertItemAtHead:item];
+    else
+        [_lruMap _bringItemToHead:item];
     BOOL writeResult = [self _p_fileWriteWithName:item->fileName data:value];
     BOOL setTimeResult = [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
-    if (!setTimeResult)
+    if (!setTimeResult)//访问时间插入失败，删除刚刚写入的文件返回NO
         [self _p_fileDeleteWithName:item->fileName];
     return writeResult && setTimeResult;
 }
@@ -208,7 +336,7 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
 {
     if (key.length == 0 || ![key isKindOfClass:[NSString class]])
         return nil;
-    _HYDiskCacheItem *item = _p_itemForKey(key, _itemsDic);
+    _HYDiskCacheItem *item = _p_itemForKey(key, _lruMap);
     if (!item)
         return nil;
     NSData *data = [self _p_fileReadWithName:item->fileName];
@@ -225,11 +353,11 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
     if (key.length == 0 || ![key isKindOfClass:[NSString class]])
         return nil;
     
-    _HYDiskCacheItem *item = _p_itemForKey(key, _itemsDic);
+    _HYDiskCacheItem *item = _p_itemForKey(key, _lruMap);
     if (!item)
         return nil;
     
-    _p_removeItem(key, _itemsDic);
+    _p_removeItem(key, _lruMap, item);
     return [self _p_fileDeleteWithName:item->fileName];
 }
 
@@ -247,51 +375,72 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
 
 - (BOOL)_removeAllValues
 {
-    CFDictionaryRemoveAllValues(_itemsDic);
-    return [self _p_fileMoveAllToTrash];
+    if ([self _p_fileMoveAllToTrash])
+    {
+        [_lruMap _removeAllItem];
+        [self _p_removeAllTrashFileInBackground];
+        return YES;
+    }
+    return NO;
 }
-
+//初始化
 - (void)_p_initializeFileCacheRecord
 {
-    NSArray *keys = @[ NSURLContentModificationDateKey,
+    NSArray *urlkeys = @[ NSURLContentModificationDateKey,
                        NSURLTotalFileAllocatedSizeKey,
                        NSURLCreationDateKey];
     
     NSError *error = nil;
     NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[NSURL fileURLWithPath:_dataPath]
-                                                   includingPropertiesForKeys:keys
+                                                   includingPropertiesForKeys:urlkeys
                                                                       options:NSDirectoryEnumerationSkipsHiddenFiles
                                                                         error:&error];
-    if(error) NSLog(@"%@", error);
-    for (NSURL *fileURL in files)
+    if(error)
+        NSLog(@"%@", error);
+    else
     {
-        _HYDiskCacheItem *item = [[_HYDiskCacheItem alloc] init];
+        CFMutableDictionaryRef items =  CFDictionaryCreateMutable(CFAllocatorGetDefault(), [files count],&kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        for (NSURL *fileURL in files)
+        {
+            _HYDiskCacheItem *item = [[_HYDiskCacheItem alloc] init];
+            
+            //key
+            NSString *key = [self _p_keyForEncodedFilePath:[fileURL absoluteString]];
+            item->key = key;
+            item->fileName = [fileURL lastPathComponent];
+            
+            error = nil;
+            NSDictionary *dictionary = [fileURL resourceValuesForKeys:urlkeys error:&error];
+            if(error) NSLog(@"%@", error);
+            
+            //进入缓存的时间
+            NSDate *creationDate = [dictionary objectForKey:NSURLCreationDateKey];
+            if (creationDate) item->inCacheDate = creationDate;
+            
+            //最后访问时间
+            NSDate *lastAccessDate = [dictionary objectForKey:NSURLContentModificationDateKey];
+            if (lastAccessDate)
+                item->lastAccessDate = lastAccessDate;
+            else
+                item->lastAccessDate = creationDate;
+            
+            //cost
+            NSNumber *fileSize = [dictionary objectForKey:NSURLTotalFileAllocatedSizeKey];
+            if (fileSize) item->byteCost = [fileSize unsignedIntegerValue];
+            
+            CFDictionarySetValue(items, (__bridge const void*)key, (__bridge const void*)item);
+        }
         
-        //key
-        NSString *key = [self _p_keyForEncodedFilePath:[fileURL absoluteString]];
-        item->key = key;
-        item->fileName = [fileURL lastPathComponent];
-        
-        error = nil;
-        NSDictionary *dictionary = [fileURL resourceValuesForKeys:keys error:&error];
-        if(error) NSLog(@"%@", error);
-        
-        //进入缓存的时间
-        NSDate *creationDate = [dictionary objectForKey:NSURLCreationDateKey];
-        if (creationDate) item->inCacheDate = creationDate;
-        
-        //最后访问时间
-        NSDate *lastAccessDate = [dictionary objectForKey:NSURLContentModificationDateKey];
-        if (lastAccessDate)
-            item->lastAccessDate = lastAccessDate;
-        else
-            item->lastAccessDate = creationDate;
-    
-        //cost
-        NSNumber *fileSize = [dictionary objectForKey:NSURLTotalFileAllocatedSizeKey];
-        if (fileSize) item->byteCost = [fileSize unsignedIntegerValue];
-        
-        CFDictionarySetValue(_itemsDic, (__bridge const void*)key, (__bridge const void*)item);
+        NSMutableDictionary *dic = (__bridge NSMutableDictionary *)items;
+        NSArray *keys = [dic keysSortedByValueUsingSelector:@selector(compare:)];
+        for (NSString *key in keys)
+        {
+            _HYDiskCacheItem *item = CFDictionaryGetValue(items, (__bridge const void *)key);
+            if (item)
+                [_lruMap _insertItemAtHead:item];
+        }
+        CFRelease(items);
+        items = nil;
     }
 }
 
@@ -328,14 +477,16 @@ inline void _p_removeItem(NSString *key, CFMutableDictionaryRef dic);
     return success;
 }
 
-_HYDiskCacheItem * _p_itemForKey(NSString *key, CFMutableDictionaryRef dic)
+_HYDiskCacheItem * _p_itemForKey(NSString *key, _HYDiskCacheItemLinkMap *map)
 {
-    return CFDictionaryGetValue(dic, (__bridge const void*)key);
+    if (key)
+        return CFDictionaryGetValue(map->_itemsDic, (__bridge const void*)key);
 }
 
-void _p_removeItem(NSString *key, CFMutableDictionaryRef dic)
+void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem *item)
 {
-    CFDictionaryRemoveValue(dic, (__bridge const void*)key);
+    if (item && map && key)
+        [map _removeItem:item];
 }
 
 - (BOOL)_p_fileWriteWithName:(NSString *)fileName data:(NSData *)data
@@ -565,6 +716,75 @@ void _p_removeItem(NSString *key, CFMutableDictionaryRef dic)
         object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     
     return object;
+}
+
+- (void)removeObjectForKey:(NSString *)key
+                 withBlock:(__nullable HYDiskCacheBlock)block
+{
+    __weak HYDiskCache *weakSelf = self;
+    dispatch_async(_dataQueue, ^{
+        
+        __strong HYDiskCache *stronglySelf = weakSelf;
+        [self removeObjectForKey:key];
+        if (block)
+        {
+            block(stronglySelf);
+        }
+    });
+}
+
+- (void)removeObjectForKey:(NSString *)key
+{
+    if(![key isKindOfClass:[NSString class]] || key.length == 0) return;
+    
+    lock();
+    [_storage _removeValueForKey:key];
+    unLock();
+}
+
+- (void)removeObjectForKeys:(NSArray<NSString *> *)keys
+                  withBlock:(__nullable HYDiskCacheBlock)block
+{
+    __weak HYDiskCache *weakSelf = self;
+    dispatch_async(_dataQueue, ^{
+        
+        __strong HYDiskCache *stronglySelf = weakSelf;
+        [self removeObjectForKeys:keys];
+        if (block)
+        {
+            block(stronglySelf);
+        }
+    });
+}
+
+- (void)removeObjectForKeys:(NSArray<NSString *> *)keys
+{
+    if(![keys isKindOfClass:[NSArray class]] || keys.count == 0) return;
+    
+    lock();
+    [_storage _removeValueForKeys:keys];
+    unLock();
+}
+
+- (void)removeAllObjectWithBlock:(__nullable HYDiskCacheBlock)block
+{
+    __weak HYDiskCache *weakSelf = self;
+    dispatch_async(_dataQueue, ^{
+        
+        __strong HYDiskCache *stronglySelf = weakSelf;
+        [self removeAllObject];
+        if (block)
+        {
+            block(stronglySelf);
+        }
+    });
+}
+
+- (void)removeAllObject
+{
+    lock();
+    [_storage _removeAllValues];
+    unLock();
 }
 
 @end

@@ -45,46 +45,87 @@
     
     for (NSInteger index = 0; index < 1000; ++index)
     {
-        [_keys addObject:[NSString stringWithFormat:@"%d", index]];
-        //[_values addObject:[NSNumber numberWithInt:100]];
+        [_keys addObject:[NSString stringWithFormat:@"%ld", (long)index]];
+        [_values addObject:[NSNumber numberWithInt:index]];
     }
     
+    //[_diskCache objectForKey:@"10"];
+    [self testDiskSet];
+    //[self testRemoveDisk];
+    [self testDiskRead];
     //[self testDiskSet];
-    [self testReadDisk];
-    
-    //[self testRemove];
+    //[self testDiskRemove];
     //[self testTrimCost];
 }
 
 - (void)testDiskSet
 {
+    dispatch_queue_t queue1 = dispatch_queue_create("f", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_queue_t queue2 = dispatch_queue_create("1", DISPATCH_QUEUE_CONCURRENT);
+    
     CFTimeInterval start = CACurrentMediaTime();
     for (NSInteger index = 0; index < 1000; ++index)
     {
         [_diskCache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
     }
+    
+//    for (NSInteger index = 0; index < 1000; ++index)
+//    {
+//        dispatch_sync(queue2, ^{
+//            
+//            [_diskCache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
+//        });
+//    }
     CFTimeInterval finish = CACurrentMediaTime();
     
     CFTimeInterval f = finish - start;
     printf("set disk:   %8.2f\n", f * 1000);
 }
 
-- (void)testReadDisk
+- (void)testDiskRead
 {
-     CFTimeInterval start = CACurrentMediaTime();
+    dispatch_queue_t queue1 = dispatch_queue_create("f", NULL);
+    dispatch_queue_t queue2 = dispatch_queue_create("1", NULL);
+    
+    CFTimeInterval start = CACurrentMediaTime();
     for (NSInteger index = 0; index < 1000; ++index)
     {
-//        dispatch_async(queue, ^{
-//
-//            [_diskCache objectForKey:[_keys objectAtIndex:index] withBlock:^(HYDiskCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-//                
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    
-//                    NSLog(@"Finish %@", object);
-//                });
-//            }];
-//        });
-        [_diskCache objectForKey:[_keys objectAtIndex:index]];
+        dispatch_async(queue1, ^{
+          
+            id object =  [_diskCache objectForKey:[_keys objectAtIndex:index]];
+            
+            [_diskCache removeObjectForKey:[_keys objectAtIndex:index]];
+            dispatch_async(dispatch_get_main_queue(), ^{
+               
+                NSLog(@"%@", object);
+            });
+        });
+    }
+    
+    for (NSInteger index = 999; index == 0; --index)
+    {
+        dispatch_async(queue2, ^{
+            
+            id object =  [_diskCache objectForKey:[_keys objectAtIndex:index]];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                NSLog(@"%@", object);
+            });
+        });
+    }
+    CFTimeInterval finish = CACurrentMediaTime();
+    
+    CFTimeInterval f = finish - start;
+    printf("read disk:   %8.2f\n", f * 1000);
+}
+
+- (void)testDiskRemove
+{
+    CFTimeInterval start = CACurrentMediaTime();
+    for (NSInteger index = 0; index < 500; ++index)
+    {
+        [_diskCache removeAllObject];
     }
     CFTimeInterval finish = CACurrentMediaTime();
     
@@ -124,27 +165,30 @@
 
 - (void)testRemove
 {
-    for (NSInteger index = 0; index < 100; ++index)
+    dispatch_queue_t queue1 = dispatch_queue_create("f", NULL);
+    dispatch_queue_t queue2 = dispatch_queue_create("1", NULL);
+    
+    CFTimeInterval start = CACurrentMediaTime();
+    for (NSInteger index = 0; index < 500; ++index)
     {
-//                [_cache removeObjectForKey:[_keys objectAtIndex:index] withBlock:^(HYMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        
-//                        NSLog(@"Finish %@", object);
-//                    });
-//                }];
+        dispatch_async(queue1, ^{
+            
+            [_diskCache removeObjectForKey:[_keys objectAtIndex:index]];
+        });
     }
+    
+    for (NSInteger index = 500; index < 1000; ++index)
+    {
+        dispatch_async(queue2, ^{
+            
+            [_diskCache removeObjectForKey:[_keys objectAtIndex:index]];
+        });
+    }
+    CFTimeInterval finish = CACurrentMediaTime();
+    
+    CFTimeInterval f = finish - start;
+    printf("read disk:   %8.2f\n", f * 1000);
 
-//    CFTimeInterval start = CACurrentMediaTime();
-//    [_cache removeAllObjectWithBlock:^(HYMemoryCache * _Nonnull cache) {
-//       
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            
-//            CFTimeInterval finish = CACurrentMediaTime();
-//            
-//            CFTimeInterval f = finish - start;
-//            printf("remove:   %8.2f\n", f * 1000);
-//        });
-//    }];
 }
 
 - (void)testTrimCost
