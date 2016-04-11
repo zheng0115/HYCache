@@ -845,6 +845,54 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
     [self trimToCost:self.byteCostLimit block:block];
 }
 
+- (void)p_trimToAgeLimitRecursively
+{
+    lock();
+    NSTimeInterval maxAge = _maxAge;
+    NSTimeInterval (^block)(id) = _customMaxAge;
+    NSTimeInterval trimInterval = _trimToMaxAgeInterval;
+    __block _HYDiskCacheItem *item = _storage->_lruMap->_tail;
+    unLock();
+    
+    if (maxAge == 0 && !block) return;
+    
+    NSDate *distantFuture = [NSDate distantFuture];
+    while (item)
+    {
+        id object =  [self objectForKey:item->key];
+        if (object)
+        {
+            NSTimeInterval age = 0;
+            if (block)
+                age = block(object);
+            else
+                age = maxAge;
+            NSTimeInterval objectAgeSinceNow = [item->lastAccessDate timeIntervalSinceNow];
+            if (objectAgeSinceNow >= age && ![item->lastAccessDate isEqualToDate:distantFuture])
+            {
+                lock();
+                [_storage _removeValueForKey:item->key];
+                item = _storage->_lruMap->_tail;
+                unLock();
+            }
+            else
+            {
+                item = nil;
+            }
+        }
+    }
+    
+    dispatch_time_t interval = dispatch_time(DISPATCH_TIME_NOW, (int64_t)((trimInterval == 0 ? maxAge:trimInterval) * NSEC_PER_SEC));
+    
+    __weak HYDiskCache *weakSelf = self;
+    dispatch_after(interval, _dataQueue, ^{
+        
+        HYDiskCache *stronglySelf = weakSelf;
+        [stronglySelf p_trimToAgeLimitRecursively];
+    });
+}
+
+
 #pragma mark getter setter for thread-safe
 
 - (NSUInteger)totalByteCostNow
@@ -884,6 +932,8 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
     lock();
     _maxAge = maxAge;
     unLock();
+    
+    [self p_trimToAgeLimitRecursively];
 }
 
 - (void)setTrimToMaxAgeInterval:(NSTimeInterval)trimToMaxAgeInterval

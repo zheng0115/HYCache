@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../Pod/Classes/HYDiskCache/HYDiskCache.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../Pod/Classes/HYMemoryCache/HYMemoryCache.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../Pod/Classes/HYMemoryCache/HYMemoryCache.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../HYCache.podspec" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../README.md" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../LICENSE" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Podfile" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/HYCache/HYCache-Info.plist" isTestSource="false" />
@@ -19,57 +19,56 @@
       <sourceFolder url="file://$MODULE_DIR$/HYCache/main.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/HYCache/HYViewController.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tests/bid@2x.png" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Tests/Tests.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tests/Tests-Prefix.pch" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Tests/Tests-Info.plist" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tests/en.lproj/InfoPlist.strings" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Tests/Tests-Info.plist" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Tests/Tests.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPExpect.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPUnsupportedObject.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPExpect.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/ExpectaObject.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPDefines.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPUnsupportedObject.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatcherHelpers.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+raiseWithReason.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beInstanceOf.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beFalsy.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beLessThanOrEqualTo.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+respondTo.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+raiseWithReason.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+contain.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beNil.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beInTheRangeOf.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beLessThanOrEqualTo.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beSupersetOf.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beKindOf.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatcherHelpers.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beNil.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beLessThanOrEqualTo.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beInTheRangeOf.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beSupersetOf.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+equal.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+postNotification.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beLessThan.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beGreaterThan.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beCloseTo.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beginWith.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+equal.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beNil.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beGreaterThan.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beCloseTo.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+respondTo.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+equal.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+respondTo.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+raise.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+match.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beGreaterThanOrEqualTo.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatcherHelpers.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+match.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+haveCountOf.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+haveCountOf.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beGreaterThanOrEqualTo.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beSubclassOf.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+raiseWithReason.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+haveCountOf.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+contain.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+respondTo.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beKindOf.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beSubclassOf.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beSupersetOf.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beCloseTo.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+postNotification.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beLessThan.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+contain.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+equal.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beGreaterThanOrEqualTo.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beginWith.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+raise.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beKindOf.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beCloseTo.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+endWith.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beTruthy.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beIdenticalTo.m" isTestSource="false" />
@@ -77,19 +76,20 @@
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beTruthy.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beIdenticalTo.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+conformTo.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beLessThan.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beginWith.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+haveCountOf.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+conformTo.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beInstanceOf.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Matchers/EXPMatchers+beFalsy.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/Expecta.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/ExpectaObject.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPBlockDefinedMatcher.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/NSValue+Expecta.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPMatcher.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPBlockDefinedMatcher.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/ExpectaObject.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/NSValue+Expecta.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPFloatTuple.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/ExpectaSupport.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/ExpectaObject.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/ExpectaSupport.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/NSObject+Expecta.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta/Expecta/EXPDoubleTuple.m" isTestSource="false" />
@@ -100,29 +100,29 @@
       <sourceFolder url="file://$MODULE_DIR$/Pods/PINDiskCache.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExcludeGlobalBeforeAfterEach.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTCallSite.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExample.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTGlobalBeforeAfterEach.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTCallSite.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTCompiledExample.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSharedExampleGroups.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaDSL.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaTypes.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExample.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTTestSuite.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSpec.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaUtility.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTTestSuite.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/Specta.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/XCTest+Private.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaUtility.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaTypes.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExample.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTCompiledExample.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSharedExampleGroups.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSpec.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/XCTestCase+Specta.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaDSL.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTCompiledExample.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSharedExampleGroups.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSpec.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/XCTestCase+Specta.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SpectaDSL.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTCallSite.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExampleGroup.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExampleGroup.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTSpec.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/XCTestCase+Specta.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/Specta.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/XCTest+Private.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Specta/Specta/Specta/SPTExampleGroup.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta/Expecta.modulemap" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta/Expecta-dummy.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta/Expecta.xcconfig" isTestSource="false" />
@@ -141,20 +141,20 @@
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Specta/Info.plist" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Specta/Specta-prefix.pch" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Specta/Specta.xcconfig" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/FBSnapshotTestCase.modulemap" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/FBSnapshotTestCase.xcconfig" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/Info.plist" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/FBSnapshotTestCase-prefix.pch" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/FBSnapshotTestCase.modulemap" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/FBSnapshotTestCase-dummy.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/FBSnapshotTestCase/FBSnapshotTestCase.xcconfig" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-acknowledgements.markdown" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-umbrella.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-resources.sh" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests.release.xcconfig" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests.debug.xcconfig" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-frameworks.sh" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-acknowledgements.plist" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests.modulemap" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Info.plist" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-acknowledgements.markdown" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-frameworks.sh" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Tests/Pods-HYCache_Tests-dummy.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Example/Pods-HYCache_Example-frameworks.sh" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Example/Pods-HYCache_Example-dummy.m" isTestSource="false" />
@@ -167,10 +167,10 @@
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Example/Pods-HYCache_Example-resources.sh" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Pods-HYCache_Example/Pods-HYCache_Example-acknowledgements.markdown" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Expecta+Snapshots.xcconfig" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Expecta+Snapshots-prefix.pch" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Expecta+Snapshots-dummy.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Expecta+Snapshots.modulemap" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Info.plist" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Expecta+Snapshots-prefix.pch" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Target Support Files/Expecta+Snapshots/Expecta+Snapshots-umbrella.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/PINDiskCache.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/FBSnapshotTestCase.m" isTestSource="false" />
@@ -180,20 +180,22 @@
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/FBSnapshotTestCasePlatform.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/FBSnapshotTestController.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Diff.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Diff.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIApplication+StrictKeyWindow.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Compare.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIApplication+StrictKeyWindow.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Snapshot.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Compare.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIApplication+StrictKeyWindow.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Diff.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/Categories/UIImage+Snapshot.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/FBSnapshotTestCase/FBSnapshotTestCase/FBSnapshotTestCase.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/ExpectaObject+FBSnapshotTest.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/ExpectaObject+FBSnapshotTest.m" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/EXPMatchers+FBSnapshotTest.m" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/EXPMatchers+FBSnapshotTest.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../README.md" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/EXPMatchers+FBSnapshotTest.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/ExpectaObject+FBSnapshotTest.m" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pods/Expecta+Snapshots/ExpectaObject+FBSnapshotTest.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../HYCache.podspec" isTestSource="false" />
     </content>
+    <content url="file://$USER_HOME$/Library/Caches/AppCode2016.1/DerivedData/HYCache-cdxdqotsvsevyofhuojxayywhtve/Build/Intermediates/Pods.build/Debug-iphoneos/HYCache.build/DerivedSources" />
+    <content url="file://$USER_HOME$/Library/Caches/AppCode2016.1/DerivedData/HYCache-cdxdqotsvsevyofhuojxayywhtve/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-HYCache_Example.build/DerivedSources" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library name="Header Search Paths">
