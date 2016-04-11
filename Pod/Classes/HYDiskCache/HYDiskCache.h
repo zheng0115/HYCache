@@ -67,11 +67,6 @@ typedef void (^HYDiskCacheObjectBlock) (HYDiskCache *cache, NSString *key, id __
 @property (nullable, copy) id (^customUnarchiveBlock)(NSData *data);
 
 /**
- *  可以自定义一类对象的maxAge，如果一类对象自定义了maxAge，那么会覆盖上面cache 的 maxAge
- */
-@property (nonatomic, copy) NSTimeInterval (^customMaxAge)(id object);
-
-/**
  *  异步存储对象，该方法会立即返回，添加完毕之后block会在内部的concurrent queue中回调
     block
  *

@@ -307,33 +307,37 @@ inline void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCa
     if (!value || ![value isKindOfClass:[NSData class]])
         return NO;
     
-    BOOL alreadyHas = YES;
     _HYDiskCacheItem *item = CFDictionaryGetValue(_lruMap->_itemsDic, (__bridge const void*)key);
     if (!item)
     {
-        alreadyHas = NO;
         item = [[_HYDiskCacheItem alloc] init];
+        item->key = key;
+        item->fileName = [self _p_fileNameForKey:item->key];
+        item->byteCost = value.length;
+        item->inCacheDate = [NSDate date];
+        item->lastAccessDate = [NSDate distantFuture];//暂无访问
+        item->fileName = [self _p_fileNameForKey:item->key];
+        [_lruMap _insertItemAtHead:item];
     }
-    
-    item->key = key;
-    item->fileName = [self _p_fileNameForKey:item->key];
-    item->byteCost = value.length;
-    item->inCacheDate = [NSDate date];
-    item->lastAccessDate = [NSDate distantFuture];//暂无访问
-    item->fileName = [self _p_fileNameForKey:item->key];
-    
+    else
+    {
+        //如果item已经存在，那么更新totalByteCost
+        _lruMap->_totalByteCost += value.length - item->byteCost;
+        
+        item->key = key;
+        item->fileName = [self _p_fileNameForKey:item->key];
+        item->byteCost = value.length;
+        item->inCacheDate = [NSDate date];
+        item->lastAccessDate = [NSDate distantFuture];//暂无访问
+        item->fileName = [self _p_fileNameForKey:item->key];
+        
+        [_lruMap _bringItemToHead:item];
+    }
     BOOL writeResult = [self _p_fileWriteWithName:item->fileName data:value];
     BOOL setTimeResult = [self _p_setFileAccessDate:item->lastAccessDate forFileName:item->fileName];
     if (!setTimeResult)//访问时间插入失败，删除刚刚写入的文件
     {
-        [self _p_fileDeleteWithName:item->fileName];
-    }
-    else
-    {
-        if (!alreadyHas)
-            [_lruMap _insertItemAtHead:item];
-        else
-            [_lruMap _bringItemToHead:item];
+        [self _removeValueForKey:item->key];
     }
     
     return writeResult && setTimeResult;
@@ -573,7 +577,6 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
 @synthesize trimToMaxAgeInterval = _trimToMaxAgeInterval;
 @synthesize customArchiveBlock = _customArchiveBlock;
 @synthesize customUnarchiveBlock = _customUnarchiveBlock;
-@synthesize customMaxAge = _customMaxAge;
 
 - (instancetype)init
 {
@@ -849,36 +852,27 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
 {
     lock();
     NSTimeInterval maxAge = _maxAge;
-    NSTimeInterval (^block)(id) = _customMaxAge;
     NSTimeInterval trimInterval = _trimToMaxAgeInterval;
     __block _HYDiskCacheItem *item = _storage->_lruMap->_tail;
     unLock();
     
-    if (maxAge == 0 && !block) return;
+    if (maxAge == 0) return;
     
     NSDate *distantFuture = [NSDate distantFuture];
     while (item)
     {
-        id object =  [self objectForKey:item->key];
-        if (object)
+        NSTimeInterval objectAgeSinceNow = -[item->lastAccessDate timeIntervalSinceNow];
+        NSLog(@"%f, %@", objectAgeSinceNow, item);
+        if (objectAgeSinceNow >= maxAge && ![item->lastAccessDate isEqualToDate:distantFuture])
         {
-            NSTimeInterval age = 0;
-            if (block)
-                age = block(object);
-            else
-                age = maxAge;
-            NSTimeInterval objectAgeSinceNow = [item->lastAccessDate timeIntervalSinceNow];
-            if (objectAgeSinceNow >= age && ![item->lastAccessDate isEqualToDate:distantFuture])
-            {
-                lock();
-                [_storage _removeValueForKey:item->key];
-                item = _storage->_lruMap->_tail;
-                unLock();
-            }
-            else
-            {
-                item = nil;
-            }
+            lock();
+            [_storage _removeValueForKey:item->key];
+            item = _storage->_lruMap->_tail;
+            unLock();
+        }
+        else
+        {
+            item = nil;
         }
     }
     
@@ -978,21 +972,6 @@ void _p_removeItem(NSString *key, _HYDiskCacheItemLinkMap *map, _HYDiskCacheItem
 {
     lock();
     id (^block)(NSData *) = _customUnarchiveBlock;
-    unLock();
-    return block;
-}
-
-- (void)setCustomMaxAge:(NSTimeInterval (^)(id _Nonnull))customMaxAge
-{
-    lock();
-    _customMaxAge = [customMaxAge copy];
-    unLock();
-}
-
-- (NSTimeInterval (^)(id))customMaxAge
-{
-    lock();
-    NSTimeInterval (^block)(id) = _customMaxAge;
     unLock();
     return block;
 }

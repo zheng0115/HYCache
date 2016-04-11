@@ -38,6 +38,9 @@
     _memcache.trimToMaxAgeInterval = 10.0f;
     
     _diskCache = [[HYDiskCache alloc] initWithName:@"fangyuxi"];
+    _diskCache.maxAge = 60.0f;
+    _diskCache.trimToMaxAgeInterval = 5.0f;
+    
     _pinCache = [[PINDiskCache alloc] initWithName:@"yangqian"];
     
     _keys = [NSMutableArray array];
@@ -50,13 +53,13 @@
     }
     
     //[_diskCache objectForKey:@"10"];
-    [self testDiskSet];
+    //[self testDiskSet];
     //[self testRemoveDisk];
     [self testDiskRead];
     //[self testDiskSet];
     //[self testDiskRemove];
     //[self testTrimCost];
-    [self testTrimDiskCost];
+    //[self testTrimDiskCost];
 }
 
 - (void)testDiskSet
@@ -65,7 +68,7 @@
     dispatch_queue_t queue2 = dispatch_queue_create("1", DISPATCH_QUEUE_CONCURRENT);
     
     CFTimeInterval start = CACurrentMediaTime();
-    for (NSInteger index = 0; index < 1000; ++index)
+    for (NSInteger index = 0; index < 500; ++index)
     {
         [_diskCache setObject:[_values objectAtIndex:index] forKey:[_keys objectAtIndex:index]];
     }
@@ -82,7 +85,7 @@
     dispatch_queue_t queue2 = dispatch_queue_create("1", NULL);
     
     CFTimeInterval start = CACurrentMediaTime();
-    for (NSInteger index = 0; index < 1000; ++index)
+    for (NSInteger index = 0; index < 500; ++index)
     {
         [_diskCache objectForKey:[_keys objectAtIndex:index]];
     }
